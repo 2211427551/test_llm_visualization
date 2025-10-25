@@ -85,6 +85,13 @@ The project follows a modern full-stack architecture:
 
 - **Text Input with Validation**: Real-time character and token counting with length limits (500 chars max)
 - **Model Execution**: Run text through a simulated neural network model via `/model/forward` endpoint
+- **Forward Tracing API** ⭐ NEW: Complete tensor tracing with `/model/forward/traced` endpoint
+  - Captures all intermediate tensors (embeddings, Q/K/V, attention scores, MoE gates, logits)
+  - Pre/post activations for every layer with detailed statistics (min/max/mean/std)
+  - Character-level and BPE tokenization options
+  - Step slicing via query parameters for incremental data loading
+  - Automatic tensor truncation with size limits (<1MB for ≤16 tokens)
+  - Timing metadata for performance profiling
 - **Interactive Step Controls**: 
   - Run/Play/Pause automated playback
   - Step forward/backward through computation layers
@@ -237,7 +244,7 @@ Returns the health status of the API.
 ```
 POST /model/forward
 ```
-Run text through the model and get step-by-step computation results.
+Run text through the model and get step-by-step computation results (original endpoint, backwards compatible).
 
 **Request Body:**
 ```json
@@ -249,6 +256,38 @@ Run text through the model and get step-by-step computation results.
 **Constraints:**
 - `text`: 1-500 characters
 - Backend may truncate tensor data for inputs with >100 tokens
+
+#### Model Forward Pass with Tracing ⭐ NEW
+```
+POST /model/forward/traced?tokenizer_type=bpe&step_index=null
+```
+Run text through the model with complete forward tracing of all intermediate tensors.
+
+**Request Body:**
+```json
+{
+  "text": "Your input text here"
+}
+```
+
+**Query Parameters:**
+- `tokenizer_type` (optional): `"char"` or `"bpe"` (default: `"bpe"`)
+- `step_index` (optional): Integer to return only specific step (0-indexed)
+
+**Constraints:**
+- `text`: 1-500 characters
+- Automatic tensor truncation for large data (keeps under 1MB for ≤16 tokens)
+- Warning issued for token count >16
+
+**Features:**
+- Complete tensor tracing (pre/post activations, weights)
+- Tensor statistics (min/max/mean/std)
+- Attention mechanism details (Q/K/V, scores, sparsity)
+- MoE layer details (gating, experts, activations)
+- Timing metadata for performance profiling
+- Step slicing for incremental data loading
+
+See [FORWARD_TRACING.md](./FORWARD_TRACING.md) for detailed documentation.
 
 #### API Documentation
 ```

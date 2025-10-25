@@ -36,6 +36,14 @@ async def root():
         "endpoints": {
             "health": "/health",
             "model_forward": "/model/forward",
+            "model_forward_traced": "/model/forward/traced",
             "docs": "/docs"
+        },
+        "features": {
+            "forward_tracing": "Complete tensor tracing with pre/post activations",
+            "tokenizers": ["char", "bpe"],
+            "step_slicing": "Query parameter 'step_index' for incremental data",
+            "tensor_statistics": "Min/max/mean/std for all tensors",
+            "size_limits": "Automatic truncation for large tensors"
         }
     }
