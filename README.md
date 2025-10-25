@@ -1,6 +1,6 @@
-# Data Visualization Platform
+# Model Execution Visualizer
 
-A full-stack application for visualizing complex data structures with interactive macro and micro views. The platform provides a robust API for data ingestion and a responsive frontend for exploring datasets at multiple levels of detail.
+A full-stack application for visualizing neural network model computation with interactive execution controls. The platform provides step-by-step visualization of model layers with animated data flow, allowing users to run text through a model and inspect the computation at each layer.
 
 ## Table of Contents
 
@@ -26,7 +26,7 @@ A full-stack application for visualizing complex data structures with interactiv
 
 ## Overview
 
-This application enables users to upload, process, and visualize large datasets through an intuitive interface. The platform is designed to handle complex data structures and provide insights through multiple visualization layers, from high-level overviews to detailed data point exploration.
+This application enables users to run text through a neural network model and visualize the computation step-by-step. Users can enter text, see it tokenized, and watch as it flows through various model layers (embedding, attention, feed-forward, etc.) with interactive controls for stepping forward/backward and automated playback. The platform provides both macro (architecture overview) and micro (layer details) views with smooth animations.
 
 ## Architecture
 
@@ -43,12 +43,19 @@ The project follows a modern full-stack architecture:
   - Async request handling for optimal performance
 
 ### Frontend
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
 - **Package Manager**: npm
+- **State Management**: Zustand
+- **Animations**: Framer Motion
+- **Styling**: Tailwind CSS
 - **Key Components**:
-  - Interactive visualization components
-  - State management for data exploration
-  - Responsive UI with macro/micro view switching
-  - Step-by-step navigation controls
+  - Text input with token count feedback and validation
+  - Execution controls (Run, Next Step, Previous Step, Play/Pause)
+  - Macro view showing model architecture with layer highlights
+  - Micro view with detailed layer data and matrix visualizations
+  - Summary panel with output probabilities
+  - Keyboard shortcuts for accessibility
 
 ```
 ┌─────────────────────────────────────────┐
@@ -76,12 +83,20 @@ The project follows a modern full-stack architecture:
 
 ## Features
 
-- **Multi-level Visualization**: Switch between macro (overview) and micro (detailed) views
-- **Interactive Navigation**: Step-by-step controls for exploring data sequences
-- **Real-time Data Processing**: Async API handles large payloads efficiently
-- **Responsive Design**: Optimized for desktop and tablet devices
-- **Data Validation**: Comprehensive input validation and error handling
-- **RESTful API**: Clean, documented API endpoints for integration
+- **Text Input with Validation**: Real-time character and token counting with length limits (500 chars max)
+- **Model Execution**: Run text through a simulated neural network model via `/model/forward` endpoint
+- **Interactive Step Controls**: 
+  - Run/Play/Pause automated playback
+  - Step forward/backward through computation layers
+  - Adjustable playback speed (0.5x - 2x)
+  - Progress slider for quick navigation
+- **Macro View**: Animated visualization of model architecture showing all layers with current step highlighted
+- **Micro View**: Detailed inspection of individual layers with activation and weight matrices
+- **Output Summary**: Token predictions with probability distributions
+- **Keyboard Shortcuts**: Full keyboard navigation support (← → Space Home End)
+- **Error Handling**: User-friendly error messages when backend is unavailable or requests fail
+- **Caching**: API responses cached per input to avoid redundant requests
+- **Truncation Warnings**: Visual indicators when backend truncates tensor data for large inputs
 
 ## Prerequisites
 
@@ -191,99 +206,91 @@ VITE_DEFAULT_VIEW=macro
 
 ### Endpoints
 
+#### Root
+```
+GET /
+```
+Returns API information and available endpoints.
+
 #### Health Check
 ```
 GET /health
 ```
 Returns the health status of the API.
 
-#### Data Upload
+#### Model Forward Pass
 ```
-POST /api/data/upload
+POST /model/forward
 ```
-Upload dataset for visualization.
+Run text through the model and get step-by-step computation results.
 
-#### Get Data
-```
-GET /api/data/{data_id}
-```
-Retrieve processed data by ID.
-
-#### List Datasets
-```
-GET /api/data/list
-```
-List all available datasets.
-
-### Request/Response Examples
-
-#### Upload Data
-
-**Request**:
-```bash
-curl -X POST "http://localhost:8000/api/data/upload" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Sales Data Q4 2024",
-    "data": [
-      {"timestamp": "2024-10-01T00:00:00Z", "value": 150.5, "category": "A"},
-      {"timestamp": "2024-10-02T00:00:00Z", "value": 200.3, "category": "B"},
-      {"timestamp": "2024-10-03T00:00:00Z", "value": 175.8, "category": "A"}
-    ],
-    "metadata": {
-      "source": "sales_system",
-      "unit": "USD"
-    }
-  }'
-```
-
-**Response** (201 Created):
+**Request Body:**
 ```json
 {
-  "id": "d4f8a2b1-3c5e-4d7a-9f2b-8e6c1a3d5f7e",
-  "name": "Sales Data Q4 2024",
-  "status": "processed",
-  "data_points": 3,
-  "created_at": "2024-10-24T15:30:00Z",
-  "summary": {
-    "min_value": 150.5,
-    "max_value": 200.3,
-    "avg_value": 175.53
-  }
+  "text": "Your input text here"
 }
 ```
 
-#### Retrieve Data
+**Constraints:**
+- `text`: 1-500 characters
+- Backend may truncate tensor data for inputs with >100 tokens
+
+#### API Documentation
+```
+GET /docs
+```
+Interactive Swagger UI documentation.
+
+### Request/Response Examples
+
+#### Model Forward Pass
 
 **Request**:
 ```bash
-curl -X GET "http://localhost:8000/api/data/d4f8a2b1-3c5e-4d7a-9f2b-8e6c1a3d5f7e"
+curl -X POST "http://localhost:8000/model/forward" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Hello world from the model"
+  }'
 ```
 
 **Response** (200 OK):
 ```json
 {
-  "id": "d4f8a2b1-3c5e-4d7a-9f2b-8e6c1a3d5f7e",
-  "name": "Sales Data Q4 2024",
-  "data": [
-    {"timestamp": "2024-10-01T00:00:00Z", "value": 150.5, "category": "A"},
-    {"timestamp": "2024-10-02T00:00:00Z", "value": 200.3, "category": "B"},
-    {"timestamp": "2024-10-03T00:00:00Z", "value": 175.8, "category": "A"}
+  "success": true,
+  "inputText": "Hello world from the model",
+  "tokens": [
+    {"text": "Hello", "id": 0},
+    {"text": "world", "id": 1},
+    {"text": "from", "id": 2},
+    {"text": "the", "id": 3},
+    {"text": "model", "id": 4}
   ],
-  "metadata": {
-    "source": "sales_system",
-    "unit": "USD"
-  },
-  "visualization_config": {
-    "macro_view": {
-      "type": "line_chart",
-      "aggregation": "daily"
+  "tokenCount": 5,
+  "steps": [
+    {
+      "stepIndex": 0,
+      "layerData": {
+        "layerId": 0,
+        "layerName": "Embedding Layer",
+        "inputShape": [5, 1],
+        "outputShape": [5, 64],
+        "activations": [[0.123, -0.456, ...], ...],
+        "weights": null,
+        "truncated": false
+      },
+      "description": "Convert tokens to dense vector representations"
     },
-    "micro_view": {
-      "type": "scatter_plot",
-      "detail_level": "full"
-    }
-  }
+    ...
+  ],
+  "outputProbabilities": [
+    {"token": "the", "probability": 0.234},
+    {"token": "is", "probability": 0.187},
+    {"token": "a", "probability": 0.152},
+    ...
+  ],
+  "warnings": null,
+  "truncated": false
 }
 ```
 
@@ -292,14 +299,12 @@ curl -X GET "http://localhost:8000/api/data/d4f8a2b1-3c5e-4d7a-9f2b-8e6c1a3d5f7e
 **Response** (400 Bad Request):
 ```json
 {
-  "error": "validation_error",
-  "message": "Invalid data format",
-  "details": {
-    "field": "data[0].timestamp",
-    "issue": "Invalid ISO 8601 format"
-  }
+  "detail": "Input text exceeds maximum length of 500 characters"
 }
 ```
+
+**Response** (500 Internal Server Error - Backend Down):
+Frontend displays: "Backend is not responding. Please ensure the server is running."
 
 ### Payload Size Considerations
 
