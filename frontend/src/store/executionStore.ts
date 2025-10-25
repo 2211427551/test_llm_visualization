@@ -8,6 +8,8 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
   error: null,
   isPlaying: false,
   playbackSpeed: 1,
+  selectedLayerId: null,
+  breadcrumbs: [],
 
   setStatus: (status) => set({ status }),
 
@@ -31,6 +33,10 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
 
   setPlaybackSpeed: (speed) => set({ playbackSpeed: speed }),
 
+  setSelectedLayer: (layerId) => set({ selectedLayerId: layerId }),
+
+  setBreadcrumbs: (breadcrumbs) => set({ breadcrumbs }),
+
   nextStep: () => {
     const { data, currentStepIndex } = get();
     if (data && currentStepIndex < data.steps.length - 1) {
@@ -53,5 +59,7 @@ export const useExecutionStore = create<ExecutionStore>((set, get) => ({
     data: null,
     error: null,
     isPlaying: false,
+    selectedLayerId: null,
+    breadcrumbs: [],
   }),
 }));

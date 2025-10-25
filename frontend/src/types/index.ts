@@ -80,4 +80,27 @@ export interface ExecutionStore extends RunState {
   nextStep: () => void;
   previousStep: () => void;
   reset: () => void;
+  selectedLayerId: string | null;
+  setSelectedLayer: (layerId: string | null) => void;
+  breadcrumbs: string[];
+  setBreadcrumbs: (breadcrumbs: string[]) => void;
+}
+
+export interface ModelNode {
+  id: string;
+  type: LayerType;
+  name: string;
+  stepIndex?: number;
+  inputShape?: number[];
+  outputShape?: number[];
+  paramCount?: number;
+  children?: ModelNode[];
+}
+
+export interface NormalizedModel {
+  embedding: ModelNode;
+  encoderBlocks: ModelNode[];
+  output: ModelNode;
+  totalParams: number;
+  maxDimension: number;
 }
