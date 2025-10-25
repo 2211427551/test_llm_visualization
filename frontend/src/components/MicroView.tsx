@@ -1,5 +1,8 @@
 import { motion } from 'framer-motion';
 import { useExecutionStore } from '../store/executionStore';
+import { AttentionInspector } from './AttentionInspector';
+import { MoEInspector } from './MoEInspector';
+import { Breadcrumb } from './Breadcrumb';
 
 export const MicroView: React.FC = () => {
   const { data, currentStepIndex } = useExecutionStore();
@@ -14,6 +17,7 @@ export const MicroView: React.FC = () => {
 
   const currentStep = data.steps[currentStepIndex];
   const layer = currentStep.layerData;
+  const tokens = data.tokens.map(t => t.text);
 
   const renderMatrix = (matrix: number[][] | undefined, label: string) => {
     if (!matrix || matrix.length === 0) return null;
@@ -61,6 +65,23 @@ export const MicroView: React.FC = () => {
     );
   };
 
+  const renderLayerContent = () => {
+    if (layer.layerType === 'attention' && layer.attentionData) {
+      return <AttentionInspector data={layer.attentionData} tokens={tokens} />;
+    }
+
+    if (layer.layerType === 'moe' && layer.moeData) {
+      return <MoEInspector data={layer.moeData} tokens={tokens} />;
+    }
+
+    return (
+      <>
+        {renderMatrix(layer.activations, 'Activations')}
+        {renderMatrix(layer.weights, 'Weights')}
+      </>
+    );
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
       <motion.div
@@ -69,13 +90,24 @@ export const MicroView: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
+        <div className="mb-4">
+          <Breadcrumb items={['Model', `Step ${currentStepIndex + 1}`, layer.layerName]} />
+        </div>
+
         <h3 className="text-lg font-semibold text-gray-800 mb-4">
           Micro View - Layer Details
         </h3>
 
         <div className="space-y-4">
           <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
-            <h4 className="text-lg font-bold text-primary-900 mb-2">{layer.layerName}</h4>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-lg font-bold text-primary-900">{layer.layerName}</h4>
+              {layer.layerType && (
+                <span className="px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full uppercase">
+                  {layer.layerType}
+                </span>
+              )}
+            </div>
             <p className="text-sm text-primary-700 mb-3">{currentStep.description}</p>
             
             <div className="grid grid-cols-2 gap-4 text-sm">
@@ -98,8 +130,7 @@ export const MicroView: React.FC = () => {
             </div>
           </div>
 
-          {renderMatrix(layer.activations, 'Activations')}
-          {renderMatrix(layer.weights, 'Weights')}
+          {renderLayerContent()}
 
           {layer.truncated && (
             <motion.div

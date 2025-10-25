@@ -13,9 +13,6 @@ export const MacroView: React.FC = () => {
     );
   }
 
-  const currentStep = data.steps[currentStepIndex];
-  const currentLayerId = currentStep.layerData.layerId;
-
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">

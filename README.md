@@ -92,6 +92,11 @@ The project follows a modern full-stack architecture:
   - Progress slider for quick navigation
 - **Macro View**: Animated visualization of model architecture showing all layers with current step highlighted
 - **Micro View**: Detailed inspection of individual layers with activation and weight matrices
+- **Advanced Layer Inspectors**: 
+  - **AttentionInspector**: Visualize Q/K/V matrices, attention scores, sparsity masks with multi-head support
+  - **MoEInspector**: Explore gating weights, expert routing, and activation distributions
+  - Interactive heatmaps with hover tooltips showing exact values and statistics
+  - Automatic downsampling for performance with large matrices
 - **Output Summary**: Token predictions with probability distributions
 - **Keyboard Shortcuts**: Full keyboard navigation support (← → Space Home End)
 - **Error Handling**: User-friendly error messages when backend is unavailable or requests fail
@@ -356,24 +361,33 @@ The **Macro View** provides a high-level overview of your entire dataset, perfec
 
 ### Micro View
 
-The **Micro View** allows detailed inspection of individual data points and their relationships.
+The **Micro View** allows detailed inspection of individual layers with specialized inspectors for attention and MoE layers.
 
 **Features**:
-- Detailed data point information
-- Zoom and pan capabilities
-- Tooltip with full metadata
-- Individual point highlighting
+- Layer-specific visualization based on type (embedding, attention, MoE, etc.)
+- Activation and weight matrix displays
+- **AttentionInspector**: Q/K/V matrices, attention scores, sparsity visualization
+- **MoEInspector**: Gating weights, expert routing, activation histograms
+- Interactive heatmaps with hover tooltips
+- Summary statistics (min, max, mean, std)
+- Automatic downsampling for large matrices
 
 **Usage**:
-1. Click on a data point or region in macro view
-2. Micro view opens with focused data
-3. Hover over points for detailed information
-4. Use zoom controls to adjust detail level
+1. Run a model forward pass
+2. Navigate through steps using controls
+3. For attention layers: Toggle between attention scores and Q/K/V views, switch heads
+4. For MoE layers: Select tokens to see expert routing, view activation distributions
+5. Hover over heatmap cells for exact values and indices
 
-**Screenshot Placeholder**:
-```
-[TODO: Add screenshot of micro view showing detailed scatter plot]
-```
+**Layer Types**:
+- **Embedding**: Token embeddings as matrices
+- **Attention**: Multi-head attention with Q/K/V and attention scores
+- **MoE**: Mixture of Experts with gating and expert activations
+- **Feedforward**: Dense layer transformations
+- **Normalization**: Layer norm statistics
+- **Output**: Final predictions
+
+For detailed documentation, see [MICRO_INSPECTORS.md](./MICRO_INSPECTORS.md)
 
 ### Step Controls
 
