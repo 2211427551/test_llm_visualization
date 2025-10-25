@@ -1,0 +1,91 @@
+{
+  "description": "Sample API payload for model forward pass with attention and MoE layers",
+  "request": {
+    "text": "Hello world from the model"
+  },
+  "response": {
+    "success": true,
+    "inputText": "Hello world from the model",
+    "tokens": [
+      { "text": "Hello", "id": 0 },
+      { "text": "world", "id": 1 },
+      { "text": "from", "id": 2 },
+      { "text": "the", "id": 3 },
+      { "text": "model", "id": 4 }
+    ],
+    "tokenCount": 5,
+    "steps": [
+      {
+        "stepIndex": 0,
+        "layerData": {
+          "layerId": 0,
+          "layerName": "Embedding Layer",
+          "layerType": "embedding",
+          "inputShape": [5, 1],
+          "outputShape": [5, 64],
+          "activations": "[[...]]",
+          "weights": null,
+          "truncated": false
+        },
+        "description": "Convert tokens to dense vector representations"
+      },
+      {
+        "stepIndex": 1,
+        "layerData": {
+          "layerId": 1,
+          "layerName": "Multi-Head Attention",
+          "layerType": "attention",
+          "inputShape": [5, 64],
+          "outputShape": [5, 64],
+          "activations": "[[...]]",
+          "weights": "[[...]]",
+          "attentionData": {
+            "queryMatrix": "[[5x64 matrix]]",
+            "keyMatrix": "[[5x64 matrix]]",
+            "valueMatrix": "[[5x64 matrix]]",
+            "attentionScores": "[[5x5 attention weights, softmax normalized]]",
+            "sparsityMask": "[[5x5 binary mask, 0=pruned, 1=active]]",
+            "numHeads": 4,
+            "headDim": 16
+          },
+          "truncated": false
+        },
+        "description": "Apply self-attention mechanism across tokens"
+      },
+      {
+        "stepIndex": 2,
+        "layerData": {
+          "layerId": 2,
+          "layerName": "Mixture of Experts (MoE)",
+          "layerType": "moe",
+          "inputShape": [5, 64],
+          "outputShape": [5, 128],
+          "activations": "[[...]]",
+          "weights": "[[...]]",
+          "moeData": {
+            "gatingWeights": "[[5x8 routing probabilities per token]]",
+            "selectedExperts": "[[top-2 expert indices per token]]",
+            "expertActivations": [
+              {
+                "expertId": 0,
+                "activations": "[64 activation values]"
+              },
+              "... 7 more experts ..."
+            ],
+            "numExperts": 8,
+            "topK": 2
+          },
+          "truncated": false
+        },
+        "description": "Route tokens to specialized expert networks"
+      }
+    ],
+    "outputProbabilities": [
+      { "token": "the", "probability": 0.234 },
+      { "token": "is", "probability": 0.187 },
+      { "token": "a", "probability": 0.152 }
+    ],
+    "warnings": null,
+    "truncated": false
+  }
+}

@@ -1,9 +1,11 @@
-# Files Created for Execution Controls Feature
+# Files Created
 
 ## Documentation
-- `IMPLEMENTATION.md` - Detailed implementation summary
+- `IMPLEMENTATION.md` - Detailed implementation summary for execution controls
+- `MICRO_INSPECTORS.md` - Documentation for attention and MoE inspectors
 - `USAGE.md` - User guide and tutorial
 - `FILES_CREATED.md` - This file
+- `sample-api-payload.json` - Sample API request/response documentation
 
 ## Scripts
 - `setup.sh` - One-time setup script for dependencies
@@ -33,9 +35,13 @@
 - `frontend/src/components/TextInput.tsx` - Text input with validation and token counting
 - `frontend/src/components/ExecutionControls.tsx` - Run, step, and playback controls
 - `frontend/src/components/MacroView.tsx` - Model architecture visualization
-- `frontend/src/components/MicroView.tsx` - Detailed layer inspection
+- `frontend/src/components/MicroView.tsx` - Detailed layer inspection with inspector integration
 - `frontend/src/components/SummaryPanel.tsx` - Output probabilities display
 - `frontend/src/components/ErrorDisplay.tsx` - Error notification component
+- `frontend/src/components/AttentionInspector.tsx` - Attention layer visualization with Q/K/V matrices
+- `frontend/src/components/MoEInspector.tsx` - MoE layer visualization with gating and experts
+- `frontend/src/components/Heatmap.tsx` - Reusable heatmap component with tooltips
+- `frontend/src/components/Breadcrumb.tsx` - Navigation breadcrumb component
 
 ### State Management
 - `frontend/src/store/executionStore.ts` - Zustand global store for execution state
@@ -48,7 +54,10 @@
 - `frontend/src/hooks/usePlayback.ts` - Automated playback hook
 
 ### Types
-- `frontend/src/types/index.ts` - TypeScript type definitions
+- `frontend/src/types/index.ts` - TypeScript type definitions (Token, LayerData, AttentionData, MoEData, etc.)
+
+### Utilities
+- `frontend/src/utils/heatmapUtils.ts` - Matrix statistics and rendering utilities
 
 ### Documentation
 - `frontend/README.md` - Frontend-specific documentation
@@ -62,9 +71,9 @@
 ### Application Code
 - `backend/app/__init__.py` - Package marker
 - `backend/app/main.py` - FastAPI application and CORS setup
-- `backend/app/models.py` - Pydantic data models
+- `backend/app/models.py` - Pydantic data models (LayerData, AttentionData, MoEData, ExpertData)
 - `backend/app/api/__init__.py` - Package marker
-- `backend/app/api/routes.py` - API endpoints (/model/forward)
+- `backend/app/api/routes.py` - API endpoints with attention/MoE simulation
 
 ### Tests
 - `backend/tests/__init__.py` - Package marker
@@ -78,11 +87,11 @@
 - `README.md` - Updated to reflect Model Execution Visualizer features
 
 ## Total Files Created
-- Frontend: 23 files
+- Frontend: 28 files (added 5 new components/utils)
 - Backend: 10 files
-- Documentation: 3 files
+- Documentation: 5 files (added 2)
 - Scripts: 3 files
-- **Total: 39 new files + 2 modified**
+- **Total: 46 new files + 3 modified (README, tailwind.config, index.css)**
 
 ## Key Technologies Used
 
@@ -105,8 +114,17 @@
 - Pytest (testing)
 
 ## Lines of Code (Approximate)
-- Frontend TypeScript: ~2,500 lines
-- Backend Python: ~400 lines
+- Frontend TypeScript: ~3,500 lines (added ~1,000 for inspectors)
+- Backend Python: ~550 lines (added ~150 for attention/MoE)
 - Configuration: ~200 lines
-- Documentation: ~1,200 lines
-- **Total: ~4,300 lines**
+- Documentation: ~2,500 lines (added ~1,300)
+- **Total: ~6,750 lines**
+
+## New Features in Micro Inspectors
+- AttentionInspector with Q/K/V matrices and attention scores
+- MoEInspector with gating weights and expert routing
+- Interactive heatmaps with hover tooltips
+- Automatic downsampling for performance
+- Summary statistics for all visualizations
+- Breadcrumb navigation
+- Layer type detection and specialized rendering

@@ -3,13 +3,41 @@ export interface Token {
   id: number;
 }
 
+export interface AttentionData {
+  queryMatrix?: number[][];
+  keyMatrix?: number[][];
+  valueMatrix?: number[][];
+  attentionScores?: number[][];
+  sparsityMask?: number[][];
+  numHeads?: number;
+  headDim?: number;
+}
+
+export interface ExpertData {
+  expertId: number;
+  activations: number[];
+}
+
+export interface MoEData {
+  gatingWeights?: number[][];
+  selectedExperts?: number[][];
+  expertActivations?: ExpertData[];
+  numExperts?: number;
+  topK?: number;
+}
+
+export type LayerType = 'attention' | 'moe' | 'feedforward' | 'embedding' | 'normalization' | 'output';
+
 export interface LayerData {
   layerId: number;
   layerName: string;
+  layerType?: LayerType;
   inputShape: number[];
   outputShape: number[];
   activations?: number[][];
   weights?: number[][];
+  attentionData?: AttentionData;
+  moeData?: MoEData;
   truncated?: boolean;
 }
 
