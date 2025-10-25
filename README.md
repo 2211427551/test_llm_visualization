@@ -90,7 +90,17 @@ The project follows a modern full-stack architecture:
   - Step forward/backward through computation layers
   - Adjustable playback speed (0.5x - 2x)
   - Progress slider for quick navigation
-- **Macro View**: Animated visualization of model architecture showing all layers with current step highlighted
+- **Dual Macro Views**: 
+  - **Architecture View**: Interactive SVG diagram showing hierarchical model structure with color-coded nodes
+  - **List View**: Sequential layer list with animated highlights and data flow indicators
+- **Model Overview Component**: 
+  - SVG-based visualization of Transformer architecture (Embedding → Encoders → Output)
+  - Interactive node selection with state management
+  - Color-coded layer types with toggle-able legend
+  - Breadcrumb navigation for layer hierarchy
+  - Summary statistics (parameter counts, dimensions)
+  - Responsive layout with window resize handling
+  - Full keyboard accessibility (Tab, Enter, Space)
 - **Micro View**: Detailed inspection of individual layers with activation and weight matrices
 - **Advanced Layer Inspectors**: 
   - **AttentionInspector**: Visualize Q/K/V matrices, attention scores, sparsity masks with multi-head support
@@ -98,7 +108,7 @@ The project follows a modern full-stack architecture:
   - Interactive heatmaps with hover tooltips showing exact values and statistics
   - Automatic downsampling for performance with large matrices
 - **Output Summary**: Token predictions with probability distributions
-- **Keyboard Shortcuts**: Full keyboard navigation support (← → Space Home End)
+- **Keyboard Shortcuts**: Full keyboard navigation support (← → Space Home End Tab)
 - **Error Handling**: User-friendly error messages when backend is unavailable or requests fail
 - **Caching**: API responses cached per input to avoid redundant requests
 - **Truncation Warnings**: Visual indicators when backend truncates tensor data for large inputs
@@ -340,24 +350,48 @@ The platform provides two complementary visualization modes to explore your data
 
 ### Macro View
 
-The **Macro View** provides a high-level overview of your entire dataset, perfect for identifying trends, patterns, and outliers.
+The platform offers two macro visualization modes:
+
+#### Architecture View (ModelOverview)
+
+The **Architecture View** displays the Transformer model structure as an interactive SVG diagram.
 
 **Features**:
-- Aggregated data representation
-- Timeline or summary charts
-- Quick filtering and sorting
-- Export capabilities
+- **Hierarchical Layout**: Embedding → Encoder Blocks → Output
+- **Interactive Nodes**: Click to select and focus on specific layers
+- **Color-Coded Layers**: Each layer type (embedding, attention, MoE, etc.) has a distinct color
+- **Summary Statistics**: Total parameters, encoder block count, max dimensions
+- **Responsive Design**: Automatically adapts to window size
+- **Keyboard Navigation**: Tab through nodes, Enter/Space to select
+- **Breadcrumb Trail**: Shows current selection path (e.g., "Encoder 1 → Attention")
+- **Hover Tooltips**: Display detailed layer information
+- **Legend**: Toggle to view all layer type colors
 
 **Usage**:
-1. Select a dataset from the dashboard
-2. The macro view loads automatically
-3. Use the toolbar to adjust aggregation levels (hourly, daily, weekly)
-4. Click on any data point to drill down to micro view
+1. Run a model forward pass
+2. Click "Architecture View" button
+3. Click any node to select it and view details in the micro view
+4. Use Tab key to navigate between nodes
+5. Hover nodes to see detailed information
+6. Toggle the legend to understand color coding
 
-**Screenshot Placeholder**:
-```
-[TODO: Add screenshot of macro view showing line chart with time series data]
-```
+For detailed documentation, see [MODEL_OVERVIEW.md](./MODEL_OVERVIEW.md)
+
+#### List View (MacroView)
+
+The **List View** shows all layers as a vertical list with animated highlights.
+
+**Features**:
+- Sequential layer display
+- Active layer highlighting
+- Animated data flow indicators
+- Compact view for many layers
+
+**Usage**:
+1. Run a model forward pass
+2. Click "List View" button
+3. Watch as layers highlight during step progression
+4. View input/output shapes for each layer
 
 ### Micro View
 

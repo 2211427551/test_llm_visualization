@@ -2,17 +2,20 @@ import { useState } from 'react';
 import { TextInput } from './components/TextInput';
 import { ExecutionControls } from './components/ExecutionControls';
 import { MacroView } from './components/MacroView';
+import { ModelOverview } from './components/ModelOverview';
 import { MicroView } from './components/MicroView';
 import { SummaryPanel } from './components/SummaryPanel';
 import { ErrorDisplay } from './components/ErrorDisplay';
+import { Breadcrumb } from './components/Breadcrumb';
 import { useExecutionStore } from './store/executionStore';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { usePlayback } from './hooks/usePlayback';
 import { runModelForward } from './api/client';
 
 function App() {
-  const { status, error, setStatus, setData, setError } = useExecutionStore();
+  const { status, error, breadcrumbs, setStatus, setData, setError } = useExecutionStore();
   const [showError, setShowError] = useState(true);
+  const [viewMode, setViewMode] = useState<'list' | 'architecture'>('architecture');
 
   useKeyboardShortcuts();
   usePlayback();
@@ -58,9 +61,44 @@ function App() {
 
           {status === 'success' && (
             <>
+              {breadcrumbs.length > 0 && (
+                <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <Breadcrumb items={breadcrumbs} />
+                </div>
+              )}
+              
+              <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-4">
+                  <button
+                    onClick={() => setViewMode('architecture')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      viewMode === 'architecture'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                    aria-pressed={viewMode === 'architecture'}
+                  >
+                    Architecture View
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                    aria-pressed={viewMode === 'list'}
+                  >
+                    List View
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 space-y-6">
-                  <MacroView />
+                  <div className="min-h-96">
+                    {viewMode === 'architecture' ? <ModelOverview /> : <MacroView />}
+                  </div>
                   <MicroView />
                 </div>
                 <div className="space-y-6">
