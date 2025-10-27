@@ -1,0 +1,182 @@
+# Transformer计算模拟器
+
+一个用于可视化和学习Transformer模型内部计算过程的教育工具。本项目提供了标准Transformer架构的逐步计算模拟，帮助理解注意力机制、前馈网络和残差连接等关键概念。
+
+## 项目概述
+
+本项目实现了一个完整的Transformer计算模拟器，包括：
+
+- **后端服务**：基于FastAPI的RESTful API，提供Transformer计算模拟
+- **逐步可视化**：记录并返回每个计算步骤的中间结果
+- **教育友好**：清晰的步骤描述和详细的元数据
+
+## 功能特性
+
+- ✅ 标准Transformer架构实现
+- ✅ 多头自注意力机制
+- ✅ 前馈神经网络（FFN）
+- ✅ Layer Normalization
+- ✅ 残差连接
+- ✅ 位置编码
+- ✅ 完整的计算步骤追踪
+- ✅ 会话管理
+- ✅ CORS支持
+
+## 技术栈
+
+### 后端
+- Python 3.9+
+- FastAPI - 现代化的Web框架
+- NumPy - 高性能矩阵计算
+- Pydantic - 数据验证和设置管理
+- Uvicorn - ASGI服务器
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+venv\Scripts\activate  # Windows
+
+pip install -r requirements.txt
+```
+
+### 启动服务
+
+```bash
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+服务启动后访问：
+- API文档：http://localhost:8000/docs
+- 健康检查：http://localhost:8000/
+
+### 运行测试
+
+```bash
+cd backend
+source venv/bin/activate
+python test_api.py
+```
+
+## API使用示例
+
+### 1. 初始化会话
+
+```bash
+curl -X POST "http://localhost:8000/api/init" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "hello world",
+    "config": {
+      "n_vocab": 50257,
+      "n_embd": 768,
+      "n_layer": 2,
+      "n_head": 12,
+      "d_k": 64,
+      "max_seq_len": 512
+    }
+  }'
+```
+
+### 2. 获取计算步骤
+
+```bash
+curl -X POST "http://localhost:8000/api/step" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "your-session-id",
+    "step": 0
+  }'
+```
+
+## 计算步骤
+
+每个Transformer层包含14个计算步骤：
+
+1. **layer_norm_1** - 注意力前的Layer Normalization
+2. **q_projection** - Query矩阵投影
+3. **k_projection** - Key矩阵投影
+4. **v_projection** - Value矩阵投影
+5. **attention_scores** - 注意力分数计算
+6. **attention_weights** - Softmax归一化
+7. **attention_output** - 注意力输出
+8. **attention_projection** - 输出投影
+9. **residual_1** - 第一个残差连接
+10. **layer_norm_2** - FFN前的Layer Normalization
+11. **ffn_hidden** - FFN第一层
+12. **ffn_relu** - ReLU激活
+13. **ffn_output** - FFN第二层
+14. **residual_2** - 第二个残差连接
+
+## 项目结构
+
+```
+.
+├── backend/                 # 后端服务
+│   ├── app/
+│   │   ├── main.py         # FastAPI应用入口
+│   │   ├── models/         # Pydantic数据模型
+│   │   ├── services/       # 核心业务逻辑
+│   │   └── utils/          # 工具和配置
+│   ├── requirements.txt    # Python依赖
+│   ├── test_api.py        # API测试脚本
+│   └── README.md          # 后端文档
+└── README.md              # 项目主文档
+```
+
+## 配置参数
+
+- `n_vocab`: 词汇表大小（默认：50257）
+- `n_embd`: 嵌入维度（默认：768）
+- `n_layer`: Transformer层数（默认：12）
+- `n_head`: 多头注意力头数（默认：12）
+- `d_k`: 每个注意力头的维度（默认：64）
+- `max_seq_len`: 最大序列长度（默认：512）
+
+## 开发指南
+
+### 添加新功能
+
+1. 在 `app/services/transformer.py` 中实现新的计算步骤
+2. 在 `app/main.py` 中添加步骤描述
+3. 更新 `app/models/` 中的数据模型（如需要）
+4. 编写测试用例
+
+### 运行开发服务器
+
+```bash
+cd backend
+source venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+## 注意事项
+
+- 权重使用随机初始化，不是预训练模型
+- 会话数据存储在内存中，服务重启后会丢失
+- 当前版本只实现标准Transformer，不包含MoE或稀疏注意力
+- 适用于教育和学习目的，不建议用于生产环境
+
+## 许可证
+
+MIT License
+
+## 贡献
+
+欢迎提交Issue和Pull Request！
+
+## 路线图
+
+- [ ] 添加前端可视化界面
+- [ ] 支持MoE（Mixture of Experts）
+- [ ] 支持稀疏注意力机制
+- [ ] 添加更多的分词器选项
+- [ ] 实现会话持久化
+- [ ] 性能优化和缓存
+- [ ] 支持批处理
