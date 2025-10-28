@@ -300,6 +300,97 @@ import { MultiHeadAttentionDemo } from '@/components/visualizations';
 <MultiHeadAttentionDemo />
 ```
 
+### 7. MoEFFNViz
+
+混合专家模型（Mixture of Experts）前馈网络完整可视化组件，这是本项目的核心创新点之一。
+
+**功能特性:**
+- Layer Normalization (Pre-Norm for FFN) 可视化
+- 门控网络/路由器计算过程展示
+- Expert selection probabilities 条形图
+- Top-K 专家选择高亮
+- Token 到专家的路由动画（贝塞尔曲线）
+- 多个专家网络并行展示
+- 专家内部 FFN 计算可视化
+- 输出加权与合并动画
+- 残差连接可视化
+- 专家负载均衡统计图
+
+**使用示例:**
+```tsx
+import { MoEFFNViz } from '@/components/visualizations';
+
+<MoEFFNViz
+  inputData={inputData}  // shape: [n_tokens, n_embd]
+  weights={{
+    ln_gamma: gamma,           // shape: [n_embd]
+    ln_beta: beta,             // shape: [n_embd]
+    gate_weights: gateWeights, // shape: [n_embd, n_experts]
+    experts: [
+      { w1: expert0_w1, w2: expert0_w2 },  // Expert 0
+      { w1: expert1_w1, w2: expert1_w2 },  // Expert 1
+      // ... more experts
+    ],
+  }}
+  config={{
+    n_experts: 8,
+    top_k: 2,
+    d_ff: 64,
+    n_embd: 16,
+  }}
+  tokenTexts={["The", "cat", "sat"]}
+  animationMode="serial"
+  onComplete={() => console.log('MoE FFN visualization complete')}
+/>
+```
+
+**Props:**
+- `inputData: number[][]` - 输入数据矩阵 [n_tokens, n_embd]
+- `weights: object` - 权重对象，包含 ln_gamma, ln_beta, gate_weights, experts[]
+- `config: object` - 配置对象，包含 n_experts, top_k, d_ff, n_embd
+- `tokenTexts?: string[]` - 可选的词元文本数组
+- `animationMode?: 'serial' | 'parallel'` - 动画模式（默认: 'serial'）
+- `onComplete?: () => void` - 动画完成回调
+
+### 8. MoEFFNDemo
+
+MoE FFN 的完整演示组件，包含配置展示、教学说明和实时可视化。
+
+**功能特性:**
+- 自动生成 MoE 测试数据
+- 实时配置信息展示
+- 核心概念说明卡片
+- MoE 优势介绍
+- 完整的可视化步骤说明
+- 启动和重启控制
+
+**使用示例:**
+```tsx
+import { MoEFFNDemo } from '@/components/visualizations';
+
+<MoEFFNDemo />
+```
+
+**核心概念:**
+- **Gating Network**: 路由每个 token 到最合适的专家
+- **Expert Networks**: 独立的 FFN 模块，各自专业化
+- **Top-K Selection**: 稀疏激活，仅选择 top-k 个专家
+- **Load Balancing**: 确保所有专家被充分利用
+
+**可视化步骤:**
+1. Layer Normalization
+2. Gating Network 计算
+3. Softmax 专家概率
+4. 条形图展示专家选择
+5. 专家网络布局
+6. 路由动画
+7. 专家内部计算
+8. 输出加权与合并
+9. 残差连接
+10. 负载均衡统计
+
+更多详细信息请参考 [MOE_FFN_VISUALIZATION.md](../../MOE_FFN_VISUALIZATION.md)
+
 ## 未来改进
 
 - [ ] 添加动画暂停/恢复控制
@@ -308,3 +399,6 @@ import { MultiHeadAttentionDemo } from '@/components/visualizations';
 - [ ] 导出动画为 GIF/视频
 - [ ] 添加可访问性 (ARIA) 支持
 - [ ] 性能监控和优化
+- [ ] MoE 热力图模式（tokens × experts）
+- [ ] 专家折叠/展开功能
+- [ ] 并行路由动画模式
