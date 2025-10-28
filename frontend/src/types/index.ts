@@ -1,3 +1,12 @@
+export interface SparseConfig {
+  pattern: 'dense' | 'sliding_window' | 'global_local' | 'blocked' | 'random' | 'custom';
+  window_size?: number;
+  block_size?: number;
+  global_tokens?: number[];
+  random_ratio?: number;
+  custom_mask?: number[][];
+}
+
 export interface ModelConfig {
   n_vocab: number;
   n_embd: number;
@@ -5,6 +14,8 @@ export interface ModelConfig {
   n_head: number;
   d_k: number;
   max_seq_len: number;
+  attention_type?: 'standard' | 'sparse';
+  sparse_config?: SparseConfig;
 }
 
 export interface InitialState {
@@ -28,4 +39,6 @@ export interface StepResponse {
   input_data: number[][];
   output_data: number[][];
   metadata: Record<string, unknown>;
+  attention_mask?: number[][];
+  sparsity?: number;
 }
