@@ -6,10 +6,11 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { TokenizationViz } from './TokenizationViz';
 import { EmbeddingViz } from './EmbeddingViz';
 import { TokenEmbeddingVisualization } from './TokenEmbeddingVisualization';
+import { MultiHeadAttentionViz } from './MultiHeadAttentionViz';
 
 // ============================================================================
 // 示例 1: 基础词元化可视化
@@ -285,6 +286,66 @@ export const Example8_LongText = () => {
 };
 
 // ============================================================================
+// 示例 9: 多头自注意力机制
+// ============================================================================
+
+export const Example9_MultiHeadAttention = () => {
+  const nTokens = 4;
+  const nEmbd = 64;
+  const nHead = 4;
+  const dK = nEmbd / nHead;
+
+  // 使用 useMemo 确保数据只生成一次
+  const { inputData, weights, config, tokenTexts } = useMemo(() => {
+    // 生成随机矩阵
+    const generateRandomMatrix = (rows: number, cols: number, scale = 1): number[][] => {
+      return Array.from({ length: rows }, () =>
+        Array.from({ length: cols }, () => (Math.random() - 0.5) * 2 * scale)
+      );
+    };
+
+    // 生成随机向量
+    const generateRandomVector = (length: number, mean = 0, scale = 1): number[] => {
+      return Array.from({ length }, () => mean + (Math.random() - 0.5) * scale);
+    };
+
+    return {
+      inputData: generateRandomMatrix(nTokens, nEmbd, 0.5),
+      weights: {
+        wq: generateRandomMatrix(nEmbd, nEmbd, 0.1),
+        wk: generateRandomMatrix(nEmbd, nEmbd, 0.1),
+        wv: generateRandomMatrix(nEmbd, nEmbd, 0.1),
+        wo: generateRandomMatrix(nEmbd, nEmbd, 0.1),
+        ln_gamma: generateRandomVector(nEmbd, 1.0, 0.1),
+        ln_beta: generateRandomVector(nEmbd, 0, 0.1),
+      },
+      config: {
+        n_head: nHead,
+        d_k: dK,
+      },
+      tokenTexts: ['The', 'cat', 'sat', 'down'],
+    };
+  }, [nTokens, nEmbd, nHead, dK]);
+
+  return (
+    <div className="p-6 bg-white rounded-lg shadow">
+      <h2 className="text-xl font-bold mb-4">示例 9: 多头自注意力机制</h2>
+      <p className="text-sm text-gray-600 mb-4">
+        展示完整的多头自注意力计算过程，包括 Layer Norm、Q/K/V 生成、注意力计算和残差连接
+      </p>
+      <MultiHeadAttentionViz
+        inputData={inputData}
+        weights={weights}
+        config={config}
+        tokenTexts={tokenTexts}
+        animationMode="serial"
+        onComplete={() => console.log('多头注意力可视化完成')}
+      />
+    </div>
+  );
+};
+
+// ============================================================================
 // 示例合集组件
 // ============================================================================
 
@@ -300,6 +361,7 @@ export const AllExamples = () => {
     { id: 6, name: '小维度', component: Example6_SmallDimension },
     { id: 7, name: '中文文本', component: Example7_ChineseText },
     { id: 8, name: '长文本', component: Example8_LongText },
+    { id: 9, name: '多头注意力', component: Example9_MultiHeadAttention },
   ];
 
   const CurrentComponent = examples.find(ex => ex.id === currentExample)?.component || Example1_BasicTokenization;
