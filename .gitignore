@@ -54,3 +54,22 @@ htmlcov/
 # Database
 *.db
 *.sqlite3
+
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+.vercel
+.turbo
+
+# npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (Next.js)
+.env*.local
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts

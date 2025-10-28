@@ -7,6 +7,7 @@
 本项目实现了一个完整的Transformer计算模拟器，包括：
 
 - **后端服务**：基于FastAPI的RESTful API，提供Transformer计算模拟
+- **前端应用**：基于Next.js 14的现代化Web界面，提供交互式可视化
 - **逐步可视化**：记录并返回每个计算步骤的中间结果
 - **教育友好**：清晰的步骤描述和详细的元数据
 
@@ -31,9 +32,16 @@
 - Pydantic - 数据验证和设置管理
 - Uvicorn - ASGI服务器
 
+### 前端
+- Next.js 14+ (App Router)
+- TypeScript
+- Tailwind CSS
+- Zustand - 状态管理
+- Axios - HTTP客户端
+
 ## 快速开始
 
-### 安装依赖
+### 1. 启动后端服务
 
 ```bash
 cd backend
@@ -43,18 +51,31 @@ source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate  # Windows
 
 pip install -r requirements.txt
-```
-
-### 启动服务
-
-```bash
-cd backend
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 服务启动后访问：
 - API文档：http://localhost:8000/docs
 - 健康检查：http://localhost:8000/
+
+### 2. 启动前端应用
+
+在另一个终端窗口中：
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+前端应用访问：http://localhost:3000
+
+### 3. 开始使用
+
+1. 在前端页面输入文本（例如："Hello world"）
+2. 点击"开始计算"按钮
+3. 使用控制面板浏览计算步骤
+4. 查看可视化结果和详细解释
 
 ### 运行测试
 
@@ -127,7 +148,18 @@ curl -X POST "http://localhost:8000/api/step" \
 │   ├── requirements.txt    # Python依赖
 │   ├── test_api.py        # API测试脚本
 │   └── README.md          # 后端文档
-└── README.md              # 项目主文档
+├── frontend/               # 前端应用
+│   ├── src/
+│   │   ├── app/           # Next.js应用路由
+│   │   ├── components/    # React组件
+│   │   ├── store/         # Zustand状态管理
+│   │   ├── services/      # API调用服务
+│   │   └── types/         # TypeScript类型定义
+│   ├── public/            # 静态资源
+│   ├── package.json       # Node.js依赖
+│   ├── SETUP.md          # 前端设置指南
+│   └── README.md         # 前端文档
+└── README.md             # 项目主文档
 ```
 
 ## 配置参数
@@ -173,7 +205,8 @@ MIT License
 
 ## 路线图
 
-- [ ] 添加前端可视化界面
+- [x] 添加前端可视化界面
+- [ ] 集成D3.js进行交互式可视化
 - [ ] 支持MoE（Mixture of Experts）
 - [ ] 支持稀疏注意力机制
 - [ ] 添加更多的分词器选项
