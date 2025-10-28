@@ -1,9 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import { useVisualizationStore } from '@/store/visualizationStore';
+import { TokenEmbeddingVisualization } from './visualizations';
 
 export default function VisualizationCanvas() {
-  const { isInitialized, currentStepData, tokenTexts } = useVisualizationStore();
+  const { 
+    isInitialized, 
+    currentStepData, 
+    tokenTexts, 
+    tokens, 
+    inputText,
+    config 
+  } = useVisualizationStore();
+  
+  const [showD3Viz, setShowD3Viz] = useState(true);
+  const [embeddings, setEmbeddings] = useState<number[][]>([]);
+  const [positionalEncodings, setPositionalEncodings] = useState<number[][]>([]);
 
   if (!isInitialized) {
     return (
@@ -29,75 +42,125 @@ export default function VisualizationCanvas() {
     );
   }
 
+  const generateMockEmbeddings = () => {
+    if (embeddings.length > 0) return;
+    
+    const mockEmbeddings = tokens.map(() => 
+      Array.from({ length: config.n_embd }, () => (Math.random() - 0.5) * 2)
+    );
+    
+    const mockPositionalEncodings = tokens.map((_, pos) => 
+      Array.from({ length: config.n_embd }, (_, i) => {
+        const angle = pos / Math.pow(10000, (2 * Math.floor(i / 2)) / config.n_embd);
+        return i % 2 === 0 ? Math.sin(angle) : Math.cos(angle);
+      })
+    );
+    
+    setEmbeddings(mockEmbeddings);
+    setPositionalEncodings(mockPositionalEncodings);
+  };
+
+  if (showD3Viz && embeddings.length === 0) {
+    generateMockEmbeddings();
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 min-h-[400px]">
-      <h3 className="text-xl font-bold text-gray-800 mb-4">可视化区域</h3>
-      
-      {/* Tokens Display */}
-      <div className="mb-6">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">Token 序列:</h4>
-        <div className="flex flex-wrap gap-2">
-          {tokenTexts.map((token, idx) => (
-            <span
-              key={idx}
-              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-            >
-              {token}
-            </span>
-          ))}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-gray-800">可视化区域</h3>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setShowD3Viz(true)}
+            className={`px-3 py-1 text-sm rounded ${
+              showD3Viz
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            D3.js 动画
+          </button>
+          <button
+            onClick={() => setShowD3Viz(false)}
+            className={`px-3 py-1 text-sm rounded ${
+              !showD3Viz
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            数据视图
+          </button>
         </div>
       </div>
 
-      {/* Current Step Data */}
-      {currentStepData && (
-        <div className="space-y-4">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">当前步骤数据:</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex">
-                <span className="font-medium text-gray-600 w-32">步骤类型:</span>
-                <span className="text-gray-800">{currentStepData.step_type}</span>
-              </div>
-              <div className="flex">
-                <span className="font-medium text-gray-600 w-32">层索引:</span>
-                <span className="text-gray-800">{currentStepData.layer_index}</span>
-              </div>
-              <div className="flex">
-                <span className="font-medium text-gray-600 w-32">描述:</span>
-                <span className="text-gray-800">{currentStepData.description}</span>
-              </div>
+      {showD3Viz && embeddings.length > 0 ? (
+        <TokenEmbeddingVisualization
+          text={inputText}
+          tokens={tokens}
+          tokenTexts={tokenTexts}
+          embeddings={embeddings}
+          positionalEncodings={positionalEncodings}
+          nEmbd={config.n_embd}
+          nVocab={config.n_vocab}
+        />
+      ) : (
+        <>
+          {/* Tokens Display */}
+          <div className="mb-6">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">Token 序列:</h4>
+            <div className="flex flex-wrap gap-2">
+              {tokenTexts.map((token, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                >
+                  {token}
+                </span>
+              ))}
             </div>
           </div>
 
-          {/* Data Preview */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">数据预览 (JSON):</h4>
-            <div className="bg-gray-900 text-green-400 rounded p-3 overflow-auto max-h-96 text-xs font-mono">
-              <pre>{JSON.stringify(currentStepData, null, 2)}</pre>
-            </div>
-          </div>
-
-          {/* Metadata */}
-          {currentStepData.metadata && Object.keys(currentStepData.metadata).length > 0 && (
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">元数据:</h4>
-              <div className="bg-gray-900 text-green-400 rounded p-3 overflow-auto max-h-48 text-xs font-mono">
-                <pre>{JSON.stringify(currentStepData.metadata, null, 2)}</pre>
+          {/* Current Step Data */}
+          {currentStepData && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">当前步骤数据:</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex">
+                    <span className="font-medium text-gray-600 w-32">步骤类型:</span>
+                    <span className="text-gray-800">{currentStepData.step_type}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-medium text-gray-600 w-32">层索引:</span>
+                    <span className="text-gray-800">{currentStepData.layer_index}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-medium text-gray-600 w-32">描述:</span>
+                    <span className="text-gray-800">{currentStepData.description}</span>
+                  </div>
+                </div>
               </div>
+
+              {/* Data Preview */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">数据预览 (JSON):</h4>
+                <div className="bg-gray-900 text-green-400 rounded p-3 overflow-auto max-h-96 text-xs font-mono">
+                  <pre>{JSON.stringify(currentStepData, null, 2)}</pre>
+                </div>
+              </div>
+
+              {/* Metadata */}
+              {currentStepData.metadata && Object.keys(currentStepData.metadata).length > 0 && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">元数据:</h4>
+                  <div className="bg-gray-900 text-green-400 rounded p-3 overflow-auto max-h-48 text-xs font-mono">
+                    <pre>{JSON.stringify(currentStepData.metadata, null, 2)}</pre>
+                  </div>
+                </div>
+              )}
             </div>
           )}
-        </div>
+        </>
       )}
-
-      {/* Placeholder for D3.js */}
-      <div className="mt-6 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-        <p className="text-gray-500 text-sm">
-          📊 D3.js 可视化区域预留
-        </p>
-        <p className="text-gray-400 text-xs mt-2">
-          在后续阶段将集成交互式可视化
-        </p>
-      </div>
     </div>
   );
 }
