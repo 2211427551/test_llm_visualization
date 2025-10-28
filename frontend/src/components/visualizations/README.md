@@ -233,6 +233,73 @@ const generatePositionalEncodings = (numTokens: number, nEmbd: number) => {
 - 需要 SVG 2 支持
 - 需要 ES6+ 支持
 
+### 5. MultiHeadAttentionViz
+
+多头自注意力机制完整可视化组件，展示标准 Transformer 注意力层的所有计算步骤。
+
+**功能特性:**
+- Layer Normalization (Pre-Norm) 可视化
+- Q, K, V 矩阵生成动画
+- 矩阵乘法过程展示
+- 多个注意力头并行可视化
+- 注意力分数热力图
+- Softmax 归一化动画
+- 多头输出拼接
+- 输出线性变换 (W_o)
+- 残差连接可视化
+- 完整的交互式工具提示
+
+**使用示例:**
+```tsx
+import { MultiHeadAttentionViz } from '@/components/visualizations';
+
+<MultiHeadAttentionViz
+  inputData={inputData}  // shape: [n_tokens, n_embd]
+  weights={{
+    wq: wqMatrix,        // shape: [n_embd, n_embd]
+    wk: wkMatrix,        // shape: [n_embd, n_embd]
+    wv: wvMatrix,        // shape: [n_embd, n_embd]
+    wo: woMatrix,        // shape: [n_embd, n_embd]
+    ln_gamma: gamma,     // shape: [n_embd]
+    ln_beta: beta,       // shape: [n_embd]
+  }}
+  config={{
+    n_head: 8,
+    d_k: 64,
+  }}
+  tokenTexts={["The", "cat", "sat"]}
+  animationMode="serial"
+  onComplete={() => console.log('Attention visualization complete')}
+/>
+```
+
+**Props:**
+- `inputData: number[][]` - 输入数据矩阵 [n_tokens, n_embd]
+- `weights: object` - 权重矩阵对象，包含 wq, wk, wv, wo, ln_gamma, ln_beta
+- `config: object` - 配置对象，包含 n_head 和 d_k
+- `tokenTexts?: string[]` - 可选的词元文本数组
+- `animationMode?: 'serial' | 'parallel'` - 动画模式（默认: 'serial'）
+- `onComplete?: () => void` - 动画完成回调
+
+### 6. MultiHeadAttentionDemo
+
+多头自注意力机制的完整演示组件，包含配置面板、说明文档和交互控制。
+
+**功能特性:**
+- 自动生成测试数据
+- 可配置的动画模式
+- 进度显示和步骤指示
+- 完整的说明文档
+- 数学公式展示
+- 交互提示指南
+
+**使用示例:**
+```tsx
+import { MultiHeadAttentionDemo } from '@/components/visualizations';
+
+<MultiHeadAttentionDemo />
+```
+
 ## 未来改进
 
 - [ ] 添加动画暂停/恢复控制
