@@ -23,3 +23,5 @@ class StepResponse(BaseModel):
     input_data: Any = Field(..., description="输入数据")
     output_data: Any = Field(..., description="输出数据")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="元数据")
+    attention_mask: Optional[List[List[float]]] = Field(default=None, description="注意力掩码矩阵")
+    sparsity: Optional[float] = Field(default=None, description="稀疏度")

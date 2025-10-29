@@ -80,7 +80,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">独立演示</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <a
               href="/demo"
               className="block p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
@@ -96,10 +96,17 @@ export default function Home() {
               <p className="text-sm text-green-700">Multi-Head Attention 完整流程</p>
             </a>
             <a
+              href="/sparse-attention-demo"
+              className="block p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors"
+            >
+              <h3 className="font-semibold text-orange-900 mb-2">稀疏注意力演示 🆕</h3>
+              <p className="text-sm text-orange-700">Sparse Attention 效率优化</p>
+            </a>
+            <a
               href="/moe-demo"
               className="block p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors"
             >
-              <h3 className="font-semibold text-purple-900 mb-2">MoE FFN 演示 🆕</h3>
+              <h3 className="font-semibold text-purple-900 mb-2">MoE FFN 演示</h3>
               <p className="text-sm text-purple-700">混合专家模型前馈网络</p>
             </a>
           </div>
