@@ -4,59 +4,25 @@ import InputModule from '@/components/InputModule';
 import ControlPanel from '@/components/ControlPanel';
 import VisualizationCanvas from '@/components/VisualizationCanvas';
 import ExplanationPanel from '@/components/ExplanationPanel';
+import { Header } from '@/components/Header';
 import { HelpButton } from '@/components/HelpDialog';
-import { ThemeToggle } from '@/contexts/ThemeContext';
-import { PerformanceSettings } from '@/components/PerformanceSettings';
 import { useVisualizationStore } from '@/store/visualizationStore';
+import { AlertCircle } from 'lucide-react';
 
 export default function Home() {
   const { error, reset } = useVisualizationStore();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                Transformer 计算可视化
-              </h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                逐步可视化 Transformer 模型的计算过程
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <PerformanceSettings />
-              <ThemeToggle />
-              <button
-                onClick={reset}
-                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors"
-                aria-label="Reset visualization"
-              >
-                重置
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header onReset={reset} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Error Display */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-start">
-            <svg
-              className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
+          <div className="mb-6 bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg flex items-start animate-slide-in-up">
+            <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold">错误</p>
               <p className="text-sm">{error}</p>
@@ -70,75 +36,92 @@ export default function Home() {
         {/* Control Panel */}
         <ControlPanel />
 
-        {/* Visualization and Explanation */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Visualization Canvas - 70% width on large screens */}
-          <div className="lg:col-span-2">
+        {/* Visualization and Explanation Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Visualization Canvas - 8 columns */}
+          <div className="lg:col-span-8">
             <VisualizationCanvas />
           </div>
 
-          {/* Explanation Panel - 30% width on large screens */}
-          <div className="lg:col-span-1">
+          {/* Explanation Panel - 4 columns */}
+          <div className="lg:col-span-4">
             <ExplanationPanel />
           </div>
         </div>
       </main>
 
       {/* Demo Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">独立演示</h2>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 shadow-xl">
+          <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              独立演示
+            </span>
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <a
               href="/demo"
-              className="block p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+              className="block p-4 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg border border-blue-500/30 hover:border-blue-500/50 transition-all duration-200 group"
             >
-              <h3 className="font-semibold text-blue-900 mb-2">Token 嵌入演示</h3>
-              <p className="text-sm text-blue-700">词元化和嵌入过程可视化</p>
+              <h3 className="font-semibold text-blue-300 mb-2 group-hover:text-blue-200">
+                Token 嵌入演示
+              </h3>
+              <p className="text-sm text-slate-400">词元化和嵌入过程可视化</p>
             </a>
             <a
               href="/attention-demo"
-              className="block p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors"
+              className="block p-4 bg-green-500/10 hover:bg-green-500/20 rounded-lg border border-green-500/30 hover:border-green-500/50 transition-all duration-200 group"
             >
-              <h3 className="font-semibold text-green-900 mb-2">多头注意力演示</h3>
-              <p className="text-sm text-green-700">Multi-Head Attention 完整流程</p>
+              <h3 className="font-semibold text-green-300 mb-2 group-hover:text-green-200">
+                多头注意力演示
+              </h3>
+              <p className="text-sm text-slate-400">Multi-Head Attention 完整流程</p>
             </a>
             <a
               href="/sparse-attention-demo"
-              className="block p-4 bg-orange-50 hover:bg-orange-100 rounded-lg border border-orange-200 transition-colors"
+              className="block p-4 bg-orange-500/10 hover:bg-orange-500/20 rounded-lg border border-orange-500/30 hover:border-orange-500/50 transition-all duration-200 group"
             >
-              <h3 className="font-semibold text-orange-900 mb-2">稀疏注意力演示</h3>
-              <p className="text-sm text-orange-700">Sparse Attention 效率优化</p>
+              <h3 className="font-semibold text-orange-300 mb-2 group-hover:text-orange-200">
+                稀疏注意力演示
+              </h3>
+              <p className="text-sm text-slate-400">Sparse Attention 效率优化</p>
             </a>
             <a
               href="/moe-demo"
-              className="block p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors"
+              className="block p-4 bg-purple-500/10 hover:bg-purple-500/20 rounded-lg border border-purple-500/30 hover:border-purple-500/50 transition-all duration-200 group"
             >
-              <h3 className="font-semibold text-purple-900 mb-2">MoE FFN 演示</h3>
-              <p className="text-sm text-purple-700">混合专家模型前馈网络</p>
+              <h3 className="font-semibold text-purple-300 mb-2 group-hover:text-purple-200">
+                MoE FFN 演示
+              </h3>
+              <p className="text-sm text-slate-400">混合专家模型前馈网络</p>
             </a>
             <a
               href="/output-layer-demo"
-              className="block p-4 bg-amber-50 hover:bg-amber-100 rounded-lg border border-amber-200 transition-colors"
+              className="block p-4 bg-amber-500/10 hover:bg-amber-500/20 rounded-lg border border-amber-500/30 hover:border-amber-500/50 transition-all duration-200 group"
             >
-              <h3 className="font-semibold text-amber-900 mb-2">输出层演示 🆕</h3>
-              <p className="text-sm text-amber-700">Logits、Softmax、预测结果</p>
+              <h3 className="font-semibold text-amber-300 mb-2 group-hover:text-amber-200 flex items-center gap-2">
+                输出层演示
+                <span className="text-xs bg-amber-500/20 px-2 py-0.5 rounded-full">NEW</span>
+              </h3>
+              <p className="text-sm text-slate-400">Logits、Softmax、预测结果</p>
             </a>
             <a
               href="/examples"
-              className="block p-4 bg-pink-50 hover:bg-pink-100 rounded-lg border border-pink-200 transition-colors"
+              className="block p-4 bg-pink-500/10 hover:bg-pink-500/20 rounded-lg border border-pink-500/30 hover:border-pink-500/50 transition-all duration-200 group"
             >
-              <h3 className="font-semibold text-pink-900 mb-2">示例集合</h3>
-              <p className="text-sm text-pink-700">所有可视化组件示例</p>
+              <h3 className="font-semibold text-pink-300 mb-2 group-hover:text-pink-200">
+                示例集合
+              </h3>
+              <p className="text-sm text-slate-400">所有可视化组件示例</p>
             </a>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+      <footer className="bg-slate-900/50 backdrop-blur-sm border-t border-slate-700/50 mt-12">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <p className="text-center text-sm text-slate-400">
             Transformer 计算可视化工具 - 教育演示版本
           </p>
         </div>
