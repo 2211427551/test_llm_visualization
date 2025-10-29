@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { TokenizationViz } from './TokenizationViz';
 import { EmbeddingViz } from './EmbeddingViz';
 
@@ -14,7 +14,7 @@ interface TokenEmbeddingVisualizationProps {
   nVocab: number;
 }
 
-export const TokenEmbeddingVisualization: React.FC<TokenEmbeddingVisualizationProps> = ({
+const TokenEmbeddingVisualizationComponent: React.FC<TokenEmbeddingVisualizationProps> = ({
   text,
   tokens,
   tokenTexts,
@@ -27,19 +27,19 @@ export const TokenEmbeddingVisualization: React.FC<TokenEmbeddingVisualizationPr
   const [animationMode, setAnimationMode] = useState<'serial' | 'parallel'>('serial');
   const showControls = true;
 
-  const handleTokenizationComplete = () => {
+  const handleTokenizationComplete = useCallback(() => {
     setTimeout(() => {
       setStage('embedding');
     }, 1000);
-  };
+  }, []);
 
-  const handleEmbeddingComplete = () => {
+  const handleEmbeddingComplete = useCallback(() => {
     setStage('complete');
-  };
+  }, []);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setStage('tokenization');
-  };
+  }, []);
 
   return (
     <div className="w-full space-y-4">
@@ -172,3 +172,6 @@ export const TokenEmbeddingVisualization: React.FC<TokenEmbeddingVisualizationPr
     </div>
   );
 };
+
+// Memoize the component to prevent unnecessary re-renders
+export const TokenEmbeddingVisualization = memo(TokenEmbeddingVisualizationComponent);

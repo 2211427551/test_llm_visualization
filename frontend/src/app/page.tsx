@@ -4,31 +4,39 @@ import InputModule from '@/components/InputModule';
 import ControlPanel from '@/components/ControlPanel';
 import VisualizationCanvas from '@/components/VisualizationCanvas';
 import ExplanationPanel from '@/components/ExplanationPanel';
+import { HelpButton } from '@/components/HelpDialog';
+import { ThemeToggle } from '@/contexts/ThemeContext';
+import { PerformanceSettings } from '@/components/PerformanceSettings';
 import { useVisualizationStore } from '@/store/visualizationStore';
 
 export default function Home() {
   const { error, reset } = useVisualizationStore();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                 Transformer 计算可视化
               </h1>
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 逐步可视化 Transformer 模型的计算过程
               </p>
             </div>
-            <button
-              onClick={reset}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition duration-200"
-            >
-              重置
-            </button>
+            <div className="flex items-center gap-3">
+              <PerformanceSettings />
+              <ThemeToggle />
+              <button
+                onClick={reset}
+                className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg transition-colors"
+                aria-label="Reset visualization"
+              >
+                重置
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -128,13 +136,16 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
             Transformer 计算可视化工具 - 教育演示版本
           </p>
         </div>
       </footer>
+
+      {/* Help Button */}
+      <HelpButton />
     </div>
   );
 }
