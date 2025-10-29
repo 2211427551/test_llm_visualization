@@ -77,6 +77,12 @@ async def root():
     }
 
 
+@app.get("/health")
+async def health():
+    """Basic health check endpoint for Docker healthcheck"""
+    return {"status": "healthy"}
+
+
 @app.post("/api/init", response_model=InitResponse)
 async def initialize_session(request: InitRequest):
     try:

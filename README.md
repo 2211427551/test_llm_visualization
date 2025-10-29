@@ -76,7 +76,28 @@
 
 ## 快速开始
 
-### 1. 启动后端服务
+### 方式一：Docker 部署（推荐）
+
+使用 Docker Compose 一键启动所有服务：
+
+```bash
+# 构建并启动
+docker compose up --build
+
+# 或在后台运行
+docker compose up -d --build
+```
+
+服务启动后访问：
+- 前端应用：http://localhost:3000
+- API文档：http://localhost:8000/docs
+- 健康检查：http://localhost:8000/health
+
+> 📖 详细的 Docker 部署指南请查看 [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
+
+### 方式二：本地开发
+
+#### 1. 启动后端服务
 
 ```bash
 cd backend
@@ -91,9 +112,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 服务启动后访问：
 - API文档：http://localhost:8000/docs
-- 健康检查：http://localhost:8000/
+- 健康检查：http://localhost:8000/health
 
-### 2. 启动前端应用
+#### 2. 启动前端应用
 
 在另一个终端窗口中：
 
@@ -105,7 +126,7 @@ npm run dev
 
 前端应用访问：http://localhost:3000
 
-### 3. 开始使用
+#### 3. 开始使用
 
 1. 在前端页面输入文本（例如："Hello world"）
 2. 点击"开始计算"按钮
