@@ -4,16 +4,31 @@
 
 > 📖 **[中文文档](README_zh.md)** | **[English Documentation](README.md)**
 
+## 🎉 v1.1.0 新特性
+
+**性能优化 & 用户体验提升！**
+
+- ⚡ **性能优化**: React.memo, useMemo/useCallback, LRU缓存, GZip压缩
+- 🌙 **暗黑模式**: 支持明亮/暗黑主题，自动检测系统偏好
+- ⌨️ **键盘快捷键**: Space播放/暂停, 方向键导航, R重置
+- 📊 **性能监控**: 实时显示FPS和内存使用
+- 💾 **导出功能**: 支持SVG, PNG, JSON导出
+- ❓ **帮助系统**: 内置教程和快捷键指南
+- 🎯 **三种性能模式**: 高/平衡/低，自动适配设备
+
+> 📖 详细说明请查看 [PERFORMANCE_OPTIMIZATION.md](PERFORMANCE_OPTIMIZATION.md)
+
 ## 项目概述
 
 本项目实现了一个完整的Transformer计算模拟器，包括：
 
 - **后端服务**：基于FastAPI的RESTful API，提供Transformer计算模拟
-- **前端应用**：基于Next.js 14的现代化Web界面，提供交互式可视化（D3.js）
+- **前端应用**：基于Next.js 16的现代化Web界面，提供交互式可视化（D3.js）
 - **逐步可视化**：记录并返回每个计算步骤的中间结果
 - **高级特性**：稀疏注意力（Sparse Attention）、混合专家模型（MoE）
 - **完整输出层**：Logits Head、Softmax、预测结果可视化
 - **教育友好**：清晰的步骤描述和详细的元数据
+- **生产就绪**: 性能优化、缓存、压缩、Docker支持
 
 ## 功能特性
 
