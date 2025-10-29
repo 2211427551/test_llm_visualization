@@ -141,6 +141,55 @@ export default function ExplanationPanel() {
           <li>结果: 完成一个完整的Transformer层</li>
         </ul>
       `,
+      'final_layer_norm': `
+        <strong>最终Layer Normalization</strong>
+        <p>经过所有Transformer层后，对最终输出进行Layer Normalization。</p>
+        <ul>
+          <li>目的: 确保输出的稳定性</li>
+          <li>位置: 所有Transformer Block之后</li>
+          <li>作用: 为输出层提供规范化的表示</li>
+        </ul>
+      `,
+      'token_selection': `
+        <strong>Token选择策略</strong>
+        <p>根据任务类型选择合适的token表示。</p>
+        <ul>
+          <li><strong>语言建模</strong>: 使用最后一个token（Next Token Prediction）</li>
+          <li><strong>分类任务</strong>: 使用第一个token（[CLS]）</li>
+          <li><strong>序列标注</strong>: 使用所有token</li>
+          <li>本示例: 选择最后一个token进行下一个词预测</li>
+        </ul>
+      `,
+      'logits_head': `
+        <strong>Logits Head（输出投影层）</strong>
+        <p>将token的向量投影到词汇表空间。</p>
+        <ul>
+          <li>操作: logits = x @ W_lm</li>
+          <li>权重维度: [n_embd, n_vocab]</li>
+          <li>输出维度: 词汇表大小（如50257）</li>
+          <li>作用: 为每个词汇生成未归一化的分数</li>
+        </ul>
+      `,
+      'softmax': `
+        <strong>Softmax归一化</strong>
+        <p>将logits转换为概率分布。</p>
+        <ul>
+          <li>公式: P(token_i) = exp(logit_i) / Σ exp(logit_j)</li>
+          <li>特性: 所有概率之和为1，范围[0, 1]</li>
+          <li>作用: 将分数转换为可解释的概率</li>
+          <li>温度参数: 可调整分布的平滑度</li>
+        </ul>
+      `,
+      'prediction': `
+        <strong>最终预测</strong>
+        <p>选择概率最高的token作为模型的预测结果。</p>
+        <ul>
+          <li>策略: 贪婪解码 - 选择argmax(P)</li>
+          <li>其他策略: Top-K采样、Top-P采样、Beam Search</li>
+          <li>输出: 预测的token和置信度</li>
+          <li>应用: 文本生成、对话系统、代码补全等</li>
+        </ul>
+      `,
     };
 
     return explanations[stepType] || `<p>步骤: ${stepType}</p>`;

@@ -461,7 +461,7 @@ export const SparseAttentionViz: React.FC<SparseAttentionVizProps> = ({
           currentY,
           'Masked Scores',
           d3.scaleSequential(d3.interpolateYlOrRd).domain([
-            Math.min(...maskedScores.filter(v => v > -1e8).flat()),
+            Math.min(...maskedScores.flat().filter((v: number) => v > -1e8)),
             Math.max(...maskedScores.flat())
           ]),
           true,
