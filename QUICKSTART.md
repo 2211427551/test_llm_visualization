@@ -6,7 +6,68 @@
 - **后端**：Python + FastAPI (端口 8000)
 - **前端**：Next.js 14 + TypeScript (端口 3000)
 
-## 一键启动
+## Docker 部署（推荐）
+
+### 使用 Docker Compose 一键启动
+
+```bash
+# 构建并启动所有服务
+docker compose up --build
+
+# 或在后台运行
+docker compose up -d --build
+```
+
+服务启动后：
+- 后端API：http://localhost:8000
+- 前端应用：http://localhost:3000
+- API文档：http://localhost:8000/docs
+
+### 查看日志
+
+```bash
+# 查看所有服务日志
+docker compose logs -f
+
+# 查看特定服务日志
+docker compose logs -f backend
+docker compose logs -f frontend
+```
+
+### 停止服务
+
+```bash
+# 停止服务
+docker compose down
+
+# 停止并删除卷
+docker compose down -v
+```
+
+### WSL 环境注意事项
+
+如果在 WSL (Windows Subsystem for Linux) 中运行：
+
+1. **从 WSL 内部访问**：
+   ```bash
+   curl http://localhost:3000
+   curl http://localhost:8000/health
+   ```
+
+2. **从 Windows 浏览器访问**：
+   - 直接访问：http://localhost:3000
+   - 如果无法访问，查找 WSL IP：
+     ```powershell
+     # 在 Windows PowerShell 中
+     wsl hostname -I
+     # 然后访问 http://<WSL_IP>:3000
+     ```
+
+3. **健康检查**：
+   - 后端健康检查端点：http://localhost:8000/health
+   - 详细健康信息：http://localhost:8000/api/health
+
+## 本地开发启动
 
 ### 终端 1：启动后端
 
@@ -101,25 +162,53 @@ npm run dev
 
 ## 常见问题
 
-### Q: 前端连接不上后端？
+### Docker 相关
+
+#### Q: 访问 localhost:3000 显示"连接被重置"？
+**A**: 
+1. 检查容器是否正在运行：`docker compose ps`
+2. 查看容器日志：`docker compose logs frontend`
+3. 确认端口映射：`docker ps --format "table {{.Names}}\t{{.Ports}}"`
+4. 在 WSL 环境中，尝试使用 WSL IP 地址访问
+
+#### Q: 后端健康检查失败？
+**A**: 
+1. 确认后端容器正在运行：`docker compose ps`
+2. 测试健康检查端点：`curl http://localhost:8000/health`
+3. 查看后端日志：`docker compose logs backend`
+4. 确认 curl 已安装在后端容器中（Dockerfile 已包含）
+
+#### Q: 前端无法连接后端 API？
+**A**: 
+1. 确认两个服务都在同一 Docker 网络中
+2. 检查 `NEXT_PUBLIC_API_URL` 环境变量设置
+3. 在浏览器开发者工具中检查网络请求
+4. 确认后端 CORS 配置正确
+
+#### Q: Docker Compose 显示 version 过时警告？
+**A**: 这是正常的，Docker Compose v2 不再需要 version 字段，但保留它以保持兼容性。可以安全忽略此警告。
+
+### 本地开发相关
+
+#### Q: 前端连接不上后端？
 **A**: 检查：
 1. 后端是否在 http://localhost:8000 运行
 2. 检查 `frontend/.env.local` 中的 `NEXT_PUBLIC_API_URL` 配置
 3. 查看浏览器控制台的网络请求
 
-### Q: 页面样式不正确？
+#### Q: 页面样式不正确？
 **A**: 
 1. 清除浏览器缓存
 2. 删除 `frontend/.next` 文件夹
 3. 重新运行 `npm run dev`
 
-### Q: npm install 失败？
+#### Q: npm install 失败？
 **A**: 
 1. 确保 Node.js 版本 >= 18
 2. 尝试删除 `node_modules` 和 `package-lock.json`
 3. 重新运行 `npm install`
 
-### Q: TypeScript 编译错误？
+#### Q: TypeScript 编译错误？
 **A**: 
 1. 运行 `npm run build` 查看详细错误
 2. 检查 `tsconfig.json` 配置

@@ -77,23 +77,46 @@
 
 ## 🚀 快速开始
 
-### 环境要求
+### 方式一：Docker 部署（推荐）
+
+使用 Docker Compose 一键启动所有服务：
+
+```bash
+# 构建并启动
+docker compose up --build
+
+# 或在后台运行
+docker compose up -d --build
+```
+
+服务启动后访问：
+- 🌐 **前端应用**: http://localhost:3000
+- 📚 **API文档**: http://localhost:8000/docs
+- ❤️ **健康检查**: http://localhost:8000/health
+
+> 📖 详细的 Docker 部署指南请查看 [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
+>
+> 🔧 遇到问题？运行诊断脚本：`./diagnose-docker.sh`
+
+### 方式二：本地开发
+
+#### 环境要求
 
 - **Node.js**: 18.0+ 
 - **Python**: 3.9+
 - **npm** 或 **yarn**
 - **pip**: Python包管理器
 
-### 1. 克隆项目
+#### 1. 克隆项目
 
 ```bash
 git clone <repository-url>
 cd transformer-visualization
 ```
 
-### 2. 后端部署
+#### 2. 后端部署
 
-#### 步骤1：创建虚拟环境
+##### 步骤1：创建虚拟环境
 
 ```bash
 cd backend
@@ -107,13 +130,13 @@ python -m venv venv
 venv\Scripts\activate
 ```
 
-#### 步骤2：安装依赖
+##### 步骤2：安装依赖
 
 ```bash
 pip install -r requirements.txt
 ```
 
-#### 步骤3：启动后端服务
+##### 步骤3：启动后端服务
 
 ```bash
 # 开发模式（自动重载）
@@ -123,19 +146,20 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
-#### 验证后端
+##### 验证后端
 
 访问以下地址确认服务正常运行：
 
 - 🏠 **首页**: http://localhost:8000/
 - 📚 **API文档**: http://localhost:8000/docs
 - 📖 **ReDoc文档**: http://localhost:8000/redoc
+- ❤️ **健康检查**: http://localhost:8000/health
 
-### 3. 前端部署
+#### 3. 前端部署
 
 在新的终端窗口中：
 
-#### 步骤1：安装依赖
+##### 步骤1：安装依赖
 
 ```bash
 cd frontend
@@ -144,7 +168,7 @@ npm install
 yarn install
 ```
 
-#### 步骤2：启动开发服务器
+##### 步骤2：启动开发服务器
 
 ```bash
 npm run dev
@@ -152,7 +176,7 @@ npm run dev
 yarn dev
 ```
 
-#### 步骤3：访问应用
+##### 步骤3：访问应用
 
 打开浏览器访问：**http://localhost:3000**
 
