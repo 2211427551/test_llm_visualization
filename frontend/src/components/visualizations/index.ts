@@ -8,3 +8,5 @@ export { MoEFFNViz } from './MoEFFNViz';
 export { MoEFFNDemo } from './MoEFFNDemo';
 export { SparseAttentionViz } from './SparseAttentionViz';
 export { SparseAttentionDemo } from './SparseAttentionDemo';
+export { OutputLayerViz } from './OutputLayerViz';
+export { OutputLayerDemo } from './OutputLayerDemo';

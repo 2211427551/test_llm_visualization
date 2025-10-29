@@ -391,6 +391,72 @@ import { MoEFFNDemo } from '@/components/visualizations';
 
 更多详细信息请参考 [MOE_FFN_VISUALIZATION.md](../../MOE_FFN_VISUALIZATION.md)
 
+### 9. OutputLayerViz
+
+输出层完整可视化组件，展示从最终隐藏状态到预测结果的完整流程。
+
+**功能特性:**
+- Final Layer Normalization 可视化
+- Token 选择策略展示（Next Token Prediction）
+- Logits Head 投影层可视化
+- Softmax 归一化动画
+- 预测结果高亮显示
+- Top-K 候选列表
+- 实时搜索功能
+- 概率分布柱状图
+
+**使用示例:**
+```tsx
+import { OutputLayerViz } from '@/components/visualizations';
+
+<OutputLayerViz
+  finalHiddenState={finalHiddenState}  // shape: [seq_len, n_embd]
+  vocabulary={vocabulary}              // token strings array
+  onComplete={() => console.log('Output layer visualization complete')}
+/>
+```
+
+**Props:**
+- `finalHiddenState: number[][]` - 最后一层 Transformer 的输出 [seq_len, n_embd]
+- `vocabulary: string[]` - 词汇表（token 文本数组）
+- `onComplete?: () => void` - 动画完成回调
+
+### 10. OutputLayerDemo
+
+输出层的完整演示组件，包含教学说明和交互控制。
+
+**功能特性:**
+- 自动生成测试数据
+- 完整的流程说明
+- 技术细节展示
+- 交互功能介绍
+- 启动控制
+
+**使用示例:**
+```tsx
+import { OutputLayerDemo } from '@/components/visualizations';
+
+<OutputLayerDemo />
+```
+
+**可视化阶段:**
+1. **Layer Normalization**: 归一化最终输出
+2. **Token Selection**: 选择用于预测的 token（最后一个）
+3. **Logits Head**: 投影到词汇表空间
+4. **Softmax**: 转换为概率分布
+5. **Prediction**: 显示预测结果和 Top-K 候选
+
+**特点:**
+- **Top-K 显示**: 只显示概率最高的 20 个 token（性能优化）
+- **颜色编码**: 
+  - Logits: 橙色（正值）/ 蓝色（负值）
+  - Probability: Viridis 配色
+  - Prediction: 金色高亮
+- **搜索功能**: 实时过滤和查找特定 token
+- **交互提示**: 悬停显示详细信息（token、logit、probability）
+
+更多详细信息请参考 [OUTPUT_LAYER_VISUALIZATION.md](../../OUTPUT_LAYER_VISUALIZATION.md)
+
 ## 未来改进
 
 - [ ] 添加动画暂停/恢复控制
@@ -402,3 +468,6 @@ import { MoEFFNDemo } from '@/components/visualizations';
 - [ ] MoE 热力图模式（tokens × experts）
 - [ ] 专家折叠/展开功能
 - [ ] 并行路由动画模式
+- [ ] 输出层温度参数调节
+- [ ] Beam Search 可视化
+- [ ] Top-P (Nucleus) Sampling 可视化

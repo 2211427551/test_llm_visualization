@@ -2,26 +2,45 @@
 
 一个用于可视化和学习Transformer模型内部计算过程的教育工具。本项目提供了标准Transformer架构的逐步计算模拟，帮助理解注意力机制、前馈网络和残差连接等关键概念。
 
+> 📖 **[中文文档](README_zh.md)** | **[English Documentation](README.md)**
+
 ## 项目概述
 
 本项目实现了一个完整的Transformer计算模拟器，包括：
 
 - **后端服务**：基于FastAPI的RESTful API，提供Transformer计算模拟
-- **前端应用**：基于Next.js 14的现代化Web界面，提供交互式可视化
+- **前端应用**：基于Next.js 14的现代化Web界面，提供交互式可视化（D3.js）
 - **逐步可视化**：记录并返回每个计算步骤的中间结果
+- **高级特性**：稀疏注意力（Sparse Attention）、混合专家模型（MoE）
+- **完整输出层**：Logits Head、Softmax、预测结果可视化
 - **教育友好**：清晰的步骤描述和详细的元数据
 
 ## 功能特性
 
+### 核心功能
 - ✅ 标准Transformer架构实现
-- ✅ 多头自注意力机制
+- ✅ 多头自注意力机制（Multi-Head Attention）
 - ✅ 前馈神经网络（FFN）
 - ✅ Layer Normalization
-- ✅ 残差连接
-- ✅ 位置编码
+- ✅ 残差连接（Residual Connections）
+- ✅ 位置编码（Positional Encoding）
 - ✅ 完整的计算步骤追踪
 - ✅ 会话管理
 - ✅ CORS支持
+
+### 高级特性
+- ✅ **稀疏注意力**：Sliding Window、Global-Local、Blocked、Random等多种模式
+- ✅ **混合专家模型（MoE）**：智能路由、Top-K选择、负载均衡可视化
+- ✅ **输出层可视化**：Logits Head、Softmax、Top-K预测、概率分布
+
+### 可视化功能（D3.js）
+- ✅ Token化与嵌入可视化
+- ✅ 注意力权重热图
+- ✅ 稀疏注意力掩码
+- ✅ MoE路由决策
+- ✅ 矩阵运算动画
+- ✅ 概率分布图表
+- ✅ 实时交互与悬停提示
 
 ## 技术栈
 
@@ -35,7 +54,8 @@
 ### 前端
 - Next.js 14+ (App Router)
 - TypeScript
-- Tailwind CSS
+- D3.js v7 - 数据可视化
+- Tailwind CSS - UI样式
 - Zustand - 状态管理
 - Axios - HTTP客户端
 
@@ -205,11 +225,23 @@ MIT License
 
 ## 路线图
 
+### 已完成 ✅
 - [x] 添加前端可视化界面
-- [ ] 集成D3.js进行交互式可视化
-- [ ] 支持MoE（Mixture of Experts）
-- [ ] 支持稀疏注意力机制
-- [ ] 添加更多的分词器选项
-- [ ] 实现会话持久化
+- [x] 集成D3.js进行交互式可视化
+- [x] 支持MoE（Mixture of Experts）
+- [x] 支持稀疏注意力机制
+- [x] 输出层完整可视化（Logits、Softmax、预测）
+- [x] 完整的中文文档
+
+### 进行中 🚧
+- [ ] 预训练模型加载支持
+- [ ] 更多解码策略（Beam Search、Top-P Sampling）
 - [ ] 性能优化和缓存
+
+### 计划中 📋
+- [ ] 添加更多的分词器选项
+- [ ] 实现会话持久化（数据库）
 - [ ] 支持批处理
+- [ ] 多语言界面（英文、日文等）
+- [ ] 移动端适配
+- [ ] 模型对比工具
