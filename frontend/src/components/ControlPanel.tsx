@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import { useVisualizationStore } from '@/store/visualizationStore';
+import { Card } from './ui';
+import { Play, Pause, SkipBack, SkipForward, Settings } from 'lucide-react';
 
 export default function ControlPanel() {
   const {
@@ -18,7 +20,6 @@ export default function ControlPanel() {
     currentStepData,
   } = useVisualizationStore();
 
-  // Auto-play functionality
   useEffect(() => {
     if (!isPlaying || !isInitialized) return;
 
@@ -35,112 +36,108 @@ export default function ControlPanel() {
 
   if (!isInitialized) {
     return (
-      <div className="w-full bg-gray-100 rounded-lg shadow-md p-6 mb-6">
-        <p className="text-gray-500 text-center">请先输入文本并初始化计算</p>
-      </div>
+      <Card className="mb-6">
+        <p className="text-slate-400 text-center py-4">请先输入文本并初始化计算</p>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md p-6 mb-6">
-      <div className="flex flex-col space-y-4">
-        {/* Current Step Info */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800">
-              步骤 {currentStep + 1} / {totalSteps}
-            </h3>
-            {currentStepData && (
-              <p className="text-sm text-gray-600">
-                第 {currentStepData.layer_index + 1} 层 - {currentStepData.step_type}
-              </p>
-            )}
-          </div>
+    <Card className="mb-6">
+      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+        <Settings className="w-5 h-5 text-purple-400" />
+        播放控制
+      </h3>
+      
+      {/* Current Step Info */}
+      <div className="mb-4">
+        <div className="flex justify-between text-sm text-slate-400 mb-2">
+          <span>步骤 {currentStep + 1} / {totalSteps}</span>
+          {currentStepData && (
+            <span>Layer {currentStepData.layer_index + 1} - {currentStepData.step_type}</span>
+          )}
         </div>
-
+        
         {/* Progress Bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+        <div className="relative h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div 
+            className="absolute h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
             style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
           />
         </div>
+      </div>
 
-        {/* Control Buttons */}
-        <div className="flex items-center justify-center space-x-4">
-          <button
-            className="p-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={prevStep}
-            disabled={currentStep === 0}
-            title="上一步"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          </button>
+      {/* Control Buttons */}
+      <div className="flex items-center justify-center gap-3 mb-6">
+        <button
+          className="p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-600"
+          onClick={prevStep}
+          disabled={currentStep === 0}
+          title="上一步"
+        >
+          <SkipBack className="w-5 h-5 text-slate-300" />
+        </button>
 
-          <button
-            className="p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200"
-            onClick={togglePlayback}
-            title={isPlaying ? '暂停' : '播放'}
-          >
-            {isPlaying ? (
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            )}
-          </button>
+        <button
+          className="p-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-full transition-all duration-200 shadow-lg shadow-purple-500/30"
+          onClick={togglePlayback}
+          title={isPlaying ? '暂停' : '播放'}
+        >
+          {isPlaying ? (
+            <Pause className="w-6 h-6" />
+          ) : (
+            <Play className="w-6 h-6 ml-0.5" />
+          )}
+        </button>
 
-          <button
-            className="p-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={nextStep}
-            disabled={currentStep === totalSteps - 1}
-            title="下一步"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
+        <button
+          className="p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-slate-600"
+          onClick={nextStep}
+          disabled={currentStep === totalSteps - 1}
+          title="下一步"
+        >
+          <SkipForward className="w-5 h-5 text-slate-300" />
+        </button>
+      </div>
 
-        {/* Speed Control */}
-        <div className="flex items-center space-x-4">
-          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-            速度: {playbackSpeed}x
-          </label>
-          <input
-            type="range"
-            min="0.5"
-            max="3"
+      {/* Speed Control */}
+      <div className="mb-4">
+        <label className="text-sm text-slate-300 mb-2 block">播放速度</label>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-slate-500 w-8">0.5x</span>
+          <input 
+            type="range" 
+            min="0.5" 
+            max="3" 
             step="0.5"
             value={playbackSpeed}
             onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            className="flex-1"
           />
+          <span className="text-xs text-slate-500 w-8">3x</span>
         </div>
-
-        {/* Layer Selector */}
-        <div className="flex items-center space-x-4">
-          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">
-            跳转到步骤:
-          </label>
-          <select
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={currentStep}
-            onChange={(e) => goToStep(parseInt(e.target.value))}
-          >
-            {Array.from({ length: totalSteps }, (_, i) => (
-              <option key={i} value={i}>
-                步骤 {i + 1}
-              </option>
-            ))}
-          </select>
+        <div className="text-center mt-2">
+          <span className="inline-block bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm border border-purple-500/30">
+            {playbackSpeed}x
+          </span>
         </div>
       </div>
-    </div>
+
+      {/* Step Selector */}
+      <div>
+        <label className="text-sm text-slate-300 mb-2 block">跳转到步骤</label>
+        <select 
+          className="w-full bg-slate-900/50 border border-slate-600 rounded-lg px-3 py-2 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none"
+          value={currentStep}
+          onChange={(e) => goToStep(parseInt(e.target.value))}
+        >
+          {Array.from({ length: totalSteps }, (_, i) => (
+            <option key={i} value={i}>
+              步骤 {i + 1}
+            </option>
+          ))}
+        </select>
+      </div>
+    </Card>
   );
 }

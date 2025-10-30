@@ -20,11 +20,11 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
       <div
-        className={`${sizeClasses[size]} animate-spin rounded-full border-4 border-gray-200 border-t-blue-500`}
+        className={`${sizeClasses[size]} animate-spin rounded-full border-4 border-purple-500/30 border-t-purple-500`}
         role="status"
         aria-label="Loading"
       />
-      {text && <p className="mt-2 text-sm text-gray-600">{text}</p>}
+      {text && <p className="mt-2 text-sm text-slate-400">{text}</p>}
     </div>
   );
 };
@@ -48,15 +48,15 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className={`w-full ${className}`}>
       {(text || showPercentage) && (
         <div className="flex justify-between items-center mb-2">
-          {text && <span className="text-sm text-gray-700">{text}</span>}
+          {text && <span className="text-sm text-slate-300">{text}</span>}
           {showPercentage && (
-            <span className="text-sm font-medium text-gray-900">{Math.round(percentage)}%</span>
+            <span className="text-sm font-medium text-white">{Math.round(percentage)}%</span>
           )}
         </div>
       )}
-      <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+      <div className="w-full bg-slate-700 rounded-full h-2.5 overflow-hidden">
         <div
-          className="bg-blue-500 h-2.5 rounded-full transition-all duration-300 ease-out"
+          className="bg-gradient-to-r from-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-300 ease-out"
           style={{ width: `${percentage}%` }}
           role="progressbar"
           aria-valuenow={percentage}
@@ -85,7 +85,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 
   return (
     <div
-      className={`animate-pulse bg-gray-200 ${variantClasses[variant]} ${className}`}
+      className={`animate-pulse bg-slate-700/50 ${variantClasses[variant]} ${className}`}
       aria-hidden="true"
     />
   );
