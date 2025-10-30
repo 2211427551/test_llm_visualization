@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useVisualizationStore } from '@/store/visualizationStore';
-import { Card } from './ui';
+import { Card } from '@/components/ui/card';
 import { Play, Pause, SkipBack, SkipForward, Settings } from 'lucide-react';
 
 export default function ControlPanel() {
