@@ -44,7 +44,7 @@ export function AttentionMatrix({
       cellSize,
       showValues,
       animationDuration: animated ? 500 : 0,
-      onCellHover: (i, j, value) => {
+      onCellHover: (i: number, j: number, value: number) => {
         setHoveredCell({ i, j, value });
         onHover?.(i, j, value);
       },
