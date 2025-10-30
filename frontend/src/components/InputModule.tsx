@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useVisualizationStore } from '@/store/visualizationStore';
-import { Card, Button } from './ui';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Edit3, Sparkles, Play, ChevronDown } from 'lucide-react';
 
 export default function InputModule() {
@@ -148,7 +149,7 @@ export default function InputModule() {
           </Button>
           <Button
             type="submit"
-            variant="primary"
+            variant="default"
             className="w-full"
             disabled={isLoading || isInitialized || !inputText.trim()}
           >

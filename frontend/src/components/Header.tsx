@@ -1,7 +1,7 @@
 'use client';
 
 import { RotateCcw } from 'lucide-react';
-import { Button } from './ui';
+import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/contexts/ThemeContext';
 import { PerformanceSettings } from './PerformanceSettings';
 

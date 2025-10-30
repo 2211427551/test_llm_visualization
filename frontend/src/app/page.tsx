@@ -106,6 +106,26 @@ export default function Home() {
               <p className="text-sm text-slate-400">Logits、Softmax、预测结果</p>
             </a>
             <a
+              href="/transformer-viz"
+              className="block p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20 rounded-lg border border-purple-500/30 hover:border-pink-500/50 transition-all duration-200 group"
+            >
+              <h3 className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mb-2 flex items-center gap-2">
+                Transformer 可视化
+                <span className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-0.5 rounded-full">NEW</span>
+              </h3>
+              <p className="text-sm text-slate-400">全新3D可视化，交互式动画控制</p>
+            </a>
+            <a
+              href="/viz-showcase"
+              className="block p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 hover:from-cyan-500/20 hover:to-blue-500/20 rounded-lg border border-cyan-500/30 hover:border-blue-500/50 transition-all duration-200 group"
+            >
+              <h3 className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 mb-2 flex items-center gap-2">
+                可视化展示
+                <span className="text-xs bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-2 py-0.5 rounded-full">NEW</span>
+              </h3>
+              <p className="text-sm text-slate-400">探索全新的可视化技术和组件</p>
+            </a>
+            <a
               href="/examples"
               className="block p-4 bg-pink-500/10 hover:bg-pink-500/20 rounded-lg border border-pink-500/30 hover:border-pink-500/50 transition-all duration-200 group"
             >

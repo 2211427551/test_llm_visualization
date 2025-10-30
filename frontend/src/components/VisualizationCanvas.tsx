@@ -3,8 +3,18 @@
 import { useState } from 'react';
 import { useVisualizationStore } from '@/store/visualizationStore';
 import { TokenEmbeddingVisualization } from './visualizations';
-import { Card, EmptyState } from './ui';
+import { Card } from '@/components/ui/card';
 import { Eye, Code } from 'lucide-react';
+
+function EmptyState({ icon: Icon, title, description }: { icon: any; title: string; description: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center p-12 text-center">
+      <Icon className="w-16 h-16 text-slate-600 mb-4" />
+      <h3 className="text-xl font-semibold text-slate-300 mb-2">{title}</h3>
+      <p className="text-slate-500 max-w-md">{description}</p>
+    </div>
+  );
+}
 
 export default function VisualizationCanvas() {
   const { 
@@ -23,7 +33,11 @@ export default function VisualizationCanvas() {
   if (!isInitialized) {
     return (
       <Card className="min-h-[500px] flex items-center justify-center">
-        <EmptyState />
+        <EmptyState 
+          icon={Eye} 
+          title="准备好开始了吗？"
+          description="输入一些文本开始可视化 Transformer 的计算过程"
+        />
       </Card>
     );
   }

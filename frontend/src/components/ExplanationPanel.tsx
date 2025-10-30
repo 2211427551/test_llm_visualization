@@ -1,7 +1,7 @@
 'use client';
 
 import { useVisualizationStore } from '@/store/visualizationStore';
-import { Card } from './ui';
+import { Card } from '@/components/ui/card';
 import { BookOpen, ExternalLink, Video } from 'lucide-react';
 
 export default function ExplanationPanel() {
