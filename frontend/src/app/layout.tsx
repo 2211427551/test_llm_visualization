@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { VisualizationProvider } from "@/contexts/VisualizationContext";
+import { AnimationProvider } from "@/contexts/AnimationContext";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,8 +17,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Transformer 计算可视化",
-  description: "逐步可视化 Transformer 模型的计算过程",
+  title: "Transformer Visualization - Interactive Learning Platform",
+  description: "Interactive visualization and exploration of Transformer model architecture and computations",
+  keywords: ["transformer", "visualization", "machine learning", "attention", "neural networks"],
+  authors: [{ name: "Transformer Visualization Team" }],
+  openGraph: {
+    title: "Transformer Visualization - Interactive Learning Platform",
+    description: "Interactive visualization and exploration of Transformer model architecture and computations",
+    type: "website",
+    locale: "en_US",
+  },
 };
 
 export default function RootLayout({
@@ -24,10 +35,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <meta name="theme-color" content="#0ea5e9" />
+      </head>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-slate-50 dark:bg-slate-900 min-h-screen`}>
         <ThemeProvider>
-          {children}
+          <VisualizationProvider>
+            <AnimationProvider>
+              <div className="relative min-h-screen">
+                {children}
+                <Toaster />
+              </div>
+            </AnimationProvider>
+          </VisualizationProvider>
         </ThemeProvider>
       </body>
     </html>
