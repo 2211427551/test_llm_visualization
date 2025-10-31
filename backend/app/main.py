@@ -1,17 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import StreamingResponse
 from app.models.request import InitRequest, StepRequest
 from app.models.response import InitResponse, StepResponse, InitialState
 from app.services.tokenizer import SimpleTokenizer
 from app.services.embedding import EmbeddingLayer
 from app.services.transformer import TransformerSimulator
 import uuid
-from typing import Dict, Any
+from typing import Dict, Any, AsyncGenerator
 import numpy as np
 from functools import lru_cache
 import hashlib
 import json
+import asyncio
 
 
 app = FastAPI(
@@ -289,6 +291,67 @@ async def clear_cache():
         "message": "Cache cleared successfully",
         "remaining_entries": len(computation_cache)
     }
+
+
+async def stream_steps(session_id: str) -> AsyncGenerator[str, None]:
+    """Stream computation steps as Server-Sent Events"""
+    if session_id not in sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session = sessions[session_id]
+    computation_steps = session["computation_steps"]
+    
+    for i, step_info in enumerate(computation_steps):
+        step_descriptions = {
+            "layer_norm_1": "对输入进行Layer Normalization（注意力前）",
+            "layer_norm_2": "对残差连接结果进行Layer Normalization（FFN前）",
+            "q_projection": "计算Query矩阵：Q = X @ W_q",
+            "k_projection": "计算Key矩阵：K = X @ W_k",
+            "v_projection": "计算Value矩阵：V = X @ W_v",
+            "attention_scores": "计算注意力分数：scores = (Q @ K^T) / sqrt(d_k)",
+            "attention_weights": "对注意力分数应用Softmax",
+            "attention_output": "用注意力权重加权Value：output = weights @ V",
+            "attention_projection": "多头注意力输出投影：output = attention_out @ W_o",
+            "residual_1": "残差连接：x = x + attention_output",
+            "ffn_hidden": "前馈网络第一层：hidden = x @ W1 + b1",
+            "ffn_relu": "ReLU激活函数",
+            "ffn_output": "前馈网络第二层：output = hidden @ W2 + b2",
+            "residual_2": "残差连接：x = x + ffn_output"
+        }
+        
+        step_response = {
+            "step": i,
+            "step_type": step_info["step_type"],
+            "layer_index": step_info["layer_index"],
+            "description": step_descriptions.get(
+                step_info["step_type"], 
+                f"步骤: {step_info['step_type']}"
+            ),
+            "input_data": numpy_to_list(step_info["input_data"]),
+            "output_data": numpy_to_list(step_info["output_data"]),
+            "metadata": step_info["metadata"]
+        }
+        
+        # Send as SSE
+        yield f"data: {json.dumps(step_response)}\n\n"
+        
+        # Small delay to simulate processing
+        await asyncio.sleep(0.1)
+
+
+@app.get("/api/stream/{session_id}")
+async def stream_computation(session_id: str):
+    """Stream computation steps as Server-Sent Events"""
+    return StreamingResponse(
+        stream_steps(session_id),
+        media_type="text/plain",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
 
 
 if __name__ == "__main__":

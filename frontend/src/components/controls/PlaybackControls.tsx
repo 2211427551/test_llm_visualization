@@ -1,185 +1,210 @@
 'use client';
 
-import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
-import { usePlaybackStore } from '@/stores/playback-store';
+import React from 'react';
+import { 
+  Play, 
+  Pause, 
+  Square, 
+  SkipBack, 
+  SkipForward, 
+  RotateCcw,
+  Volume2,
+  VolumeX,
+  Settings
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Card, CardContent } from '@/components/ui/card';
-import { useEffect } from 'react';
+import { useAnimation } from '@/contexts/AnimationContext';
+import { useVisualization } from '@/contexts/VisualizationContext';
+import { cn } from '@/lib/design-system';
 
 export function PlaybackControls() {
-  const { 
-    isPlaying, 
-    currentStep, 
-    totalSteps,
-    speed,
-    progress,
-    steps,
-    play,
-    pause,
-    nextStep,
-    prevStep,
-    reset,
-    setSpeed,
-    goToStep,
-    updateProgress,
-  } = usePlaybackStore();
-  
-  // Animation loop
-  useEffect(() => {
-    if (!isPlaying) return;
-    
-    let lastTime = Date.now();
-    let animationFrameId: number;
-    
-    const loop = () => {
-      const currentTime = Date.now();
-      const delta = (currentTime - lastTime) / 1000;
-      lastTime = currentTime;
-      
-      updateProgress(delta * 0.2); // Adjust speed factor
-      
-      if (isPlaying) {
-        animationFrameId = requestAnimationFrame(loop);
-      }
-    };
-    
-    animationFrameId = requestAnimationFrame(loop);
-    
-    return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [isPlaying, updateProgress]);
-  
-  const currentStepInfo = steps[currentStep];
-  const progressPercent = ((currentStep + progress) / totalSteps) * 100;
-  
+  const { state: animState, actions: animActions } = useAnimation();
+  const { state: vizState, actions: vizActions } = useVisualization();
+
+  const handleProgressChange = (value: number[]) => {
+    const progress = value[0];
+    const time = (progress / 100) * animState.duration;
+    animActions.seek(time);
+  };
+
+  const handleSpeedChange = (value: number[]) => {
+    animActions.setPlaybackSpeed(value[0]);
+  };
+
+  const stepForward = () => {
+    if (vizState.currentStep < vizState.totalSteps - 1) {
+      vizActions.nextStep();
+    }
+  };
+
+  const stepBackward = () => {
+    if (vizState.currentStep > 0) {
+      vizActions.previousStep();
+    }
+  };
+
   return (
-    <Card className="bg-slate-800 border-slate-700">
-      <CardContent className="p-6 space-y-6">
-        {/* Step info */}
-        {currentStepInfo && (
-          <div className="text-center space-y-1">
-            <div className="text-sm text-slate-400">
-              Step {currentStep + 1} / {totalSteps}
-            </div>
-            <div className="text-white font-medium">
-              {currentStepInfo.name}
-            </div>
-            <div className="text-xs text-slate-500">
-              {currentStepInfo.description}
-            </div>
-          </div>
-        )}
-        
-        {/* Main controls */}
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={reset}
-            className="hover:bg-slate-700"
-            title="Reset to beginning"
-          >
-            <RotateCcw className="w-5 h-5" />
-          </Button>
-          
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={prevStep}
-            disabled={currentStep === 0}
-            className="hover:bg-slate-700"
-            title="Previous step"
-          >
-            <SkipBack className="w-5 h-5" />
-          </Button>
-          
-          <Button
-            size="icon"
-            onClick={isPlaying ? pause : play}
-            className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-            title={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? (
-              <Pause className="w-8 h-8" />
-            ) : (
-              <Play className="w-8 h-8 ml-1" />
-            )}
-          </Button>
-          
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={nextStep}
-            disabled={currentStep === totalSteps - 1}
-            className="hover:bg-slate-700"
-            title="Next step"
-          >
-            <SkipForward className="w-5 h-5" />
-          </Button>
+    <div className="space-y-4">
+      {/* Progress Bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <span>Progress</span>
+          <span>{Math.round(animState.progress)}%</span>
         </div>
-        
-        {/* Progress bar */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-xs text-slate-400">
-            <span>Progress</span>
-            <span>{progressPercent.toFixed(0)}%</span>
-          </div>
-          
-          <div className="relative h-2 bg-slate-700 rounded-full overflow-hidden">
-            <div 
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-100"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-          
-          {/* Step markers */}
-          {totalSteps > 0 && (
-            <div className="relative h-6">
-              {Array.from({ length: totalSteps }).map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => goToStep(i)}
-                  className={`absolute w-2 h-2 rounded-full transition-all ${
-                    i === currentStep 
-                      ? 'bg-pink-500 scale-150' 
-                      : i < currentStep 
-                      ? 'bg-purple-500' 
-                      : 'bg-slate-600'
-                  }`}
-                  style={{ left: `${(i / (totalSteps - 1)) * 100}%` }}
-                  title={steps[i]?.name}
-                />
-              ))}
-            </div>
+        <Slider
+          value={[animState.progress]}
+          onValueChange={handleProgressChange}
+          max={100}
+          step={1}
+          className="w-full"
+        />
+      </div>
+
+      {/* Main Controls */}
+      <div className="flex items-center justify-center space-x-2">
+        {/* Reset */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            animActions.stop();
+            vizActions.setStep(0);
+          }}
+          className="p-2"
+        >
+          <RotateCcw className="w-4 h-4" />
+        </Button>
+
+        {/* Step Backward */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={stepBackward}
+          disabled={vizState.currentStep === 0}
+          className="p-2"
+        >
+          <SkipBack className="w-4 h-4" />
+        </Button>
+
+        {/* Play/Pause */}
+        <Button
+          variant={animState.isPlaying ? "default" : "default"}
+          size="sm"
+          onClick={() => {
+            if (animState.isPlaying) {
+              animActions.pause();
+            } else {
+              animActions.play();
+            }
+          }}
+          className="p-3"
+        >
+          {animState.isPlaying ? (
+            <Pause className="w-5 h-5" />
+          ) : (
+            <Play className="w-5 h-5" />
           )}
-        </div>
-        
-        {/* Speed control */}
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-slate-300">Speed</span>
-            <span className="text-white font-mono">{speed.toFixed(1)}x</span>
-          </div>
-          
+        </Button>
+
+        {/* Step Forward */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={stepForward}
+          disabled={vizState.currentStep >= vizState.totalSteps - 1}
+          className="p-2"
+        >
+          <SkipForward className="w-4 h-4" />
+        </Button>
+
+        {/* Stop */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={animActions.stop}
+          className="p-2"
+        >
+          <Square className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Secondary Controls */}
+      <div className="flex items-center justify-between">
+        {/* Speed Control */}
+        <div className="flex items-center space-x-2 flex-1">
+          <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+            Speed
+          </span>
           <Slider
-            value={[speed]}
-            onValueChange={([value]) => setSpeed(value)}
+            value={[animState.playbackSpeed]}
+            onValueChange={handleSpeedChange}
             min={0.25}
-            max={3}
+            max={2}
             step={0.25}
-            className="cursor-pointer"
+            className="w-20"
           />
-          
-          <div className="flex justify-between text-xs text-slate-500">
-            <span>0.25x</span>
-            <span>3x</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+            {animState.playbackSpeed}x
+          </span>
+        </div>
+
+        {/* Loop Control */}
+        <Button
+          variant={animState.isLooping ? "default" : "outline"}
+          size="sm"
+          onClick={animActions.toggleLoop}
+          className="text-xs px-2 py-1"
+        >
+          Loop
+        </Button>
+
+        {/* Reverse Control */}
+        <Button
+          variant={animState.isReversed ? "default" : "outline"}
+          size="sm"
+          onClick={animActions.toggleReverse}
+          className="text-xs px-2 py-1"
+        >
+          Reverse
+        </Button>
+      </div>
+
+      {/* Time Display */}
+      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-700">
+        <div>
+          Current: {Math.floor(animState.currentTime)}s
+        </div>
+        <div>
+          Duration: {Math.floor(animState.duration)}s
+        </div>
+      </div>
+
+      {/* Keyframes */}
+      {animState.keyframes.length > 0 && (
+        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+          <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+            Keyframes
+          </div>
+          <div className="flex space-x-1">
+            {animState.keyframes.map((keyframe, index) => (
+              <Button
+                key={keyframe.id}
+                variant="outline"
+                size="sm"
+                onClick={() => animActions.seek(keyframe.time)}
+                className={cn(
+                  "px-2 py-1 text-xs",
+                  animState.currentTime >= keyframe.time && "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                )}
+                title={keyframe.label}
+              >
+                {index + 1}
+              </Button>
+            ))}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
