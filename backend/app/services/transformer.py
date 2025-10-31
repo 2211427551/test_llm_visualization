@@ -1,5 +1,8 @@
 import numpy as np
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
+from app.utils.config import ModelConfig
+from app.services.moe import MoESimulator
+from app.services.sparse_attention import SparseAttentionSimulator
 
 
 class TransformerLayer:
@@ -128,19 +131,33 @@ class TransformerLayer:
 
 
 class TransformerSimulator:
-    def __init__(self, n_embd: int, n_layer: int, n_head: int, seed: int = 42):
+    def __init__(self, n_embd: int, n_layer: int, n_head: int, config: Optional[ModelConfig] = None, seed: int = 42):
         self.n_embd = n_embd
         self.n_layer = n_layer
         self.n_head = n_head
+        self.config = config or ModelConfig()
         
         self.layers = []
         for i in range(n_layer):
             layer_seed = seed + i
             self.layers.append(TransformerLayer(n_embd, n_head, layer_seed))
+        
+        # 初始化MoE模拟器
+        if self.config.moe_config and self.config.moe_config.enabled:
+            self.moe_simulator = MoESimulator(n_embd, self.config.moe_config, n_layer, seed)
+        else:
+            self.moe_simulator = None
+        
+        # 初始化稀疏注意力模拟器
+        if self.config.attention_type == "sparse" and self.config.sparse_config:
+            self.sparse_simulator = SparseAttentionSimulator(n_embd, n_head, self.config.sparse_config)
+        else:
+            self.sparse_simulator = None
     
     def simulate(self, x: np.ndarray) -> List[Dict[str, Any]]:
         all_computation_steps = []
         current_input = x
+        seq_len = x.shape[0]
         
         for layer_idx, layer in enumerate(self.layers):
             layer_steps = layer.forward(current_input)
@@ -156,5 +173,58 @@ class TransformerSimulator:
                 all_computation_steps.append(step_info)
             
             current_input = layer_steps[-1][2]
+            
+            # 如果启用稀疏注意力，添加稀疏注意力步骤
+            if self.sparse_simulator and step_type == "attention_output":
+                sparse_output, sparsity_info, sparse_steps = self.sparse_simulator.simulate_sparse_attention(
+                    current_input, seq_len
+                )
+                
+                for sparse_step_type, sparse_input_data, sparse_output_data, sparse_metadata in sparse_steps:
+                    sparse_step_info = {
+                        "step_type": sparse_step_type,
+                        "layer_index": layer_idx,
+                        "input_data": sparse_input_data,
+                        "output_data": sparse_output_data,
+                        "metadata": sparse_metadata,
+                        "sparsity_info": sparsity_info
+                    }
+                    all_computation_steps.append(sparse_step_info)
+                
+                current_input = sparse_output
+            
+            # 如果启用MoE，添加MoE步骤
+            if self.moe_simulator and step_type == "ffn_output":
+                moe_output, moe_routing, moe_steps = self.moe_simulator.simulate_layer(
+                    current_input, layer_idx
+                )
+                
+                for moe_step_type, moe_input_data, moe_output_data, moe_metadata in moe_steps:
+                    moe_step_info = {
+                        "step_type": moe_step_type,
+                        "layer_index": layer_idx,
+                        "input_data": moe_input_data,
+                        "output_data": moe_output_data,
+                        "metadata": moe_metadata,
+                        "moe_routing": moe_routing
+                    }
+                    all_computation_steps.append(moe_step_info)
+                
+                current_input = moe_output
         
         return all_computation_steps
+    
+    def simulate_with_trace(self, x: np.ndarray, include_metadata: bool = True) -> Dict[str, Any]:
+        """模拟并返回完整轨迹信息"""
+        import time
+        start_time = time.time()
+        
+        computation_steps = self.simulate(x)
+        end_time = time.time()
+        
+        return {
+            "computation_steps": computation_steps,
+            "execution_time_ms": (end_time - start_time) * 1000,
+            "final_output": computation_steps[-1]["output_data"] if computation_steps else x,
+            "total_steps": len(computation_steps)
+        }
