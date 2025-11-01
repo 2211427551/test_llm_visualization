@@ -62,7 +62,7 @@ export function FormulaDisplay({
               {Object.entries(variables).map(([symbol, description]) => (
                 <li key={symbol} className="flex items-start gap-2 text-slate-300">
                   <span className="inline-flex items-center px-2 py-0.5 rounded bg-slate-800 font-mono text-purple-400">
-                    {renderInlineFormula(symbol)}
+                    <InlineFormula formula={symbol} />
                   </span>
                   <span className="flex-1">{description}</span>
                 </li>
@@ -75,7 +75,7 @@ export function FormulaDisplay({
   );
 }
 
-function renderInlineFormula(formula: string): React.ReactElement {
+const InlineFormula: React.FC<{ formula: string }> = ({ formula }) => {
   const ref = useRef<HTMLSpanElement>(null);
   
   useEffect(() => {
@@ -92,7 +92,7 @@ function renderInlineFormula(formula: string): React.ReactElement {
   }, [formula]);
   
   return <span ref={ref} />;
-}
+};
 
 // Common formulas
 export const FORMULAS = {

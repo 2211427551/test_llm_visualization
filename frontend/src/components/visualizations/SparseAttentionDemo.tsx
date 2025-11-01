@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { SparseAttentionViz } from './SparseAttentionViz';
 
 export const SparseAttentionDemo: React.FC = () => {
@@ -17,21 +17,32 @@ export const SparseAttentionDemo: React.FC = () => {
   const nHead = 4;
   const dK = nEmbd / nHead;
 
-  const generateRandomMatrix = (rows: number, cols: number): number[][] => {
-    return Array(rows).fill(0).map(() => 
-      Array(cols).fill(0).map(() => (Math.random() - 0.5) * 0.5)
-    );
-  };
+  const inputData = useMemo(() => {
+    const generateRandomMatrix = (rows: number, cols: number): number[][] => {
+      return Array(rows).fill(0).map(() => 
+        Array(cols).fill(0).map(() => (Math.random() - 0.5) * 0.5)
+      );
+    };
+    return generateRandomMatrix(nTokens, nEmbd);
+  }, [nTokens, nEmbd]);
 
-  const inputData = generateRandomMatrix(nTokens, nEmbd);
-  const weights = {
-    wq: generateRandomMatrix(nEmbd, nEmbd),
-    wk: generateRandomMatrix(nEmbd, nEmbd),
-    wv: generateRandomMatrix(nEmbd, nEmbd),
-    wo: generateRandomMatrix(nEmbd, nEmbd),
-    ln_gamma: Array(nEmbd).fill(0).map(() => 1 + Math.random() * 0.1),
-    ln_beta: Array(nEmbd).fill(0).map(() => Math.random() * 0.1),
-  };
+  const weights = useMemo(() => {
+    const generateRandomMatrix = (rows: number, cols: number): number[][] => {
+      return Array(rows).fill(0).map(() => 
+        Array(cols).fill(0).map(() => (Math.random() - 0.5) * 0.5)
+      );
+    };
+    const ln_gamma = Array(nEmbd).fill(0).map(() => 1 + Math.random() * 0.1);
+    const ln_beta = Array(nEmbd).fill(0).map(() => Math.random() * 0.1);
+    return {
+      wq: generateRandomMatrix(nEmbd, nEmbd),
+      wk: generateRandomMatrix(nEmbd, nEmbd),
+      wv: generateRandomMatrix(nEmbd, nEmbd),
+      wo: generateRandomMatrix(nEmbd, nEmbd),
+      ln_gamma,
+      ln_beta,
+    };
+  }, [nEmbd]);
 
   const config = {
     n_head: nHead,

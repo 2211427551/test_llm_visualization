@@ -208,7 +208,8 @@ export function VisualizationCanvas() {
 
   // Prevent hydration issues
   useEffect(() => {
-    setIsClient(true);
+    // Use setTimeout to avoid calling setState synchronously in effect
+    setTimeout(() => setIsClient(true), 0);
   }, []);
 
   if (!isClient) {

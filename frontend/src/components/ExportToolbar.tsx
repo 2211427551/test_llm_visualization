@@ -5,7 +5,7 @@ import { useExport } from '@/hooks/useExport';
 
 interface ExportToolbarProps {
   svgRef?: React.RefObject<SVGSVGElement>;
-  data?: any;
+  data?: unknown;
   filename?: string;
 }
 
