@@ -116,7 +116,7 @@ export const ExportToolbar: React.FC<ExportToolbarProps> = ({
               </>
             )}
 
-            {data && (
+            {data != null && (
               <>
                 <div className="border-t border-gray-200 my-1" />
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useRef } from 'react';
-import { useScroll, useTransform, motion } from 'framer-motion';
+import { useScroll, useTransform, motion, MotionValue } from 'framer-motion';
 
 interface Section {
   id: string;
@@ -11,7 +11,7 @@ interface Section {
 
 interface ScrollytellingLayoutProps {
   sections: Section[];
-  visualization: (scrollProgress: number) => ReactNode;
+  visualization: (scrollProgress: MotionValue<number>) => ReactNode;
 }
 
 export function ScrollytellingLayout({ sections, visualization }: ScrollytellingLayoutProps) {
@@ -64,7 +64,7 @@ export function ScrollytellingLayout({ sections, visualization }: Scrollytelling
 interface ScrollSectionProps {
   step: number;
   totalSteps: number;
-  scrollProgress: number;
+  scrollProgress: MotionValue<number>;
   children: ReactNode;
 }
 
