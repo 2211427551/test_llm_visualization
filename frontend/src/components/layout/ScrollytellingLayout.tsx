@@ -11,7 +11,7 @@ interface Section {
 
 interface ScrollytellingLayoutProps {
   sections: Section[];
-  visualization: (scrollProgress: any) => ReactNode;
+  visualization: (scrollProgress: number) => ReactNode;
 }
 
 export function ScrollytellingLayout({ sections, visualization }: ScrollytellingLayoutProps) {
@@ -64,7 +64,7 @@ export function ScrollytellingLayout({ sections, visualization }: Scrollytelling
 interface ScrollSectionProps {
   step: number;
   totalSteps: number;
-  scrollProgress: any;
+  scrollProgress: number;
   children: ReactNode;
 }
 

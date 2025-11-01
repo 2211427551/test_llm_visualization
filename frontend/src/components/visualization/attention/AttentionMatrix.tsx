@@ -92,8 +92,9 @@ export const AttentionMatrix: React.FC<AttentionMatrixProps> = ({
         
         // 高亮行列
         cells.selectAll('rect')
-          .attr('opacity', function(cell: any) {
-            return cell.i === d.i || cell.j === d.j ? 1 : 0.3;
+          .attr('opacity', function(cell: unknown) {
+            const cellData = cell as CellData;
+            return cellData.i === d.i || cellData.j === d.j ? 1 : 0.3;
           });
       })
       .on('mouseleave', function(event: MouseEvent, d: CellData) {
@@ -109,7 +110,7 @@ export const AttentionMatrix: React.FC<AttentionMatrixProps> = ({
       cells.selectAll('rect')
         .transition()
         .duration(500)
-        .delay((_d: any, i: number) => i * 5)
+        .delay((_d: unknown, i: number) => i * 5)
         .attr('opacity', 1);
     }
 

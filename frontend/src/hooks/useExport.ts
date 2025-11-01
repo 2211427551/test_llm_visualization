@@ -59,7 +59,7 @@ export function useExport() {
     img.src = url;
   }, []);
 
-  const exportJSON = useCallback((data: any, filename: string) => {
+  const exportJSON = useCallback((data: unknown, filename: string) => {
     const jsonStr = JSON.stringify(data, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -73,7 +73,7 @@ export function useExport() {
     URL.revokeObjectURL(url);
   }, []);
 
-  const copyToClipboard = useCallback(async (data: any) => {
+  const copyToClipboard = useCallback(async (data: unknown) => {
     const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
     try {
       await navigator.clipboard.writeText(text);

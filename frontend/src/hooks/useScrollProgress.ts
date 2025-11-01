@@ -90,8 +90,8 @@ export function useScrollProgress({
 
     container.addEventListener('scroll', handleScroll, { passive: true });
     
-    // Initial calculation
-    updateScrollProgress();
+    // Initial calculation - use setTimeout to avoid synchronous setState
+    setTimeout(updateScrollProgress, 0);
 
     return () => {
       container.removeEventListener('scroll', handleScroll);

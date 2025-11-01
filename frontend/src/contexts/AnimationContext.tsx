@@ -223,7 +223,7 @@ export function AnimationProvider({ children }: { children: ReactNode }) {
         timelineRef.current.kill();
       }
     };
-  }, []);
+  }, [state.isLooping, state.isReversed, dispatch]);
   
   // Update timeline properties when state changes
   React.useEffect(() => {

@@ -52,7 +52,8 @@ export function usePerformanceMode(initialMode?: PerformanceMode) {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     );
-    const hasLimitedRAM = (navigator as any).deviceMemory && (navigator as any).deviceMemory < 4;
+    const hasLimitedRAM = (navigator as unknown as { deviceMemory?: number }).deviceMemory && 
+                          (navigator as unknown as { deviceMemory?: number }).deviceMemory! < 4;
     
     if (isMobile || hasLimitedRAM) {
       return 'low';
@@ -76,7 +77,8 @@ export function usePerformanceMode(initialMode?: PerformanceMode) {
     if (typeof window !== 'undefined' && !initialMode) {
       const saved = localStorage.getItem('performanceMode') as PerformanceMode;
       if (saved && performancePresets[saved]) {
-        setMode(saved);
+        // Use setTimeout to avoid calling setState synchronously in effect
+        setTimeout(() => setMode(saved), 0);
       }
     }
   }, [initialMode]);
@@ -110,10 +112,10 @@ export function usePerformanceMonitor() {
         lastTime = currentTime;
 
         // Measure memory if available
-        if ((performance as any).memory) {
-          const memory = (performance as any).memory;
+        const perfMemory = (performance as unknown as { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+        if (perfMemory) {
           setMemoryUsage(
-            Math.round((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100)
+            Math.round((perfMemory.usedJSHeapSize / perfMemory.jsHeapSizeLimit) * 100)
           );
         }
       }

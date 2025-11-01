@@ -38,7 +38,7 @@ export interface StepResponse {
   description: string;
   input_data: number[][];
   output_data: number[][] | number[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 // API Client Class

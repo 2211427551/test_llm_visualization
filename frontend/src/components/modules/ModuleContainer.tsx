@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { X, Maximize2, Minimize2, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -40,6 +40,23 @@ export function ModuleContainer({ type, className }: ModuleContainerProps) {
   const { state: vizState, actions: vizActions } = useVisualization();
   const config = moduleConfig[type];
   const isActive = vizState.modules[type].isActive;
+  
+  // Generate memoized random patterns
+  const attentionPattern = useMemo(() => {
+    const randomValues = Array.from({ length: 16 }, () => Math.random() * 0.8 + 0.2);
+    return randomValues.map((opacity, i) => ({
+      key: i,
+      opacity
+    }));
+  }, []);
+  
+  const expertUsage = useMemo(() => {
+    const randomValues = Array.from({ length: Math.min(4, vizState.modules.moe.experts) }, () => Math.random() * 80 + 20);
+    return randomValues.map((width, i) => ({
+      key: i,
+      width
+    }));
+  }, [vizState.modules.moe.experts]);
 
   if (!isActive) return null;
 
@@ -134,11 +151,11 @@ export function ModuleContainer({ type, className }: ModuleContainerProps) {
                 <div className="text-xs text-slate-600 dark:text-slate-400">
                   <div className="font-medium mb-1">Attention Pattern:</div>
                   <div className="grid grid-cols-4 gap-1">
-                    {Array.from({ length: 16 }, (_, i) => (
+                    {attentionPattern.map((pattern) => (
                       <div
-                        key={i}
+                        key={pattern.key}
                         className="w-4 h-4 bg-gradient-to-br from-blue-400 to-purple-500 rounded"
-                        style={{ opacity: Math.random() * 0.8 + 0.2 }}
+                        style={{ opacity: pattern.opacity }}
                       />
                     ))}
                   </div>
@@ -159,13 +176,13 @@ export function ModuleContainer({ type, className }: ModuleContainerProps) {
                 <div className="text-xs text-slate-600 dark:text-slate-400">
                   <div className="font-medium mb-1">Expert Usage:</div>
                   <div className="space-y-1">
-                    {Array.from({ length: Math.min(4, vizState.modules.moe.experts) }, (_, i) => (
-                      <div key={i} className="flex items-center space-x-2">
-                        <span className="w-16">Expert {i + 1}:</span>
+                    {expertUsage.map((usage) => (
+                      <div key={usage.key} className="flex items-center space-x-2">
+                        <span className="w-16">Expert {usage.key + 1}:</span>
                         <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
                           <div
                             className="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full"
-                            style={{ width: `${Math.random() * 80 + 20}%` }}
+                            style={{ width: `${usage.width}%` }}
                           />
                         </div>
                       </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useCallback, ReactNode } from 'react';
-import { colors } from '@/lib/design-system';
 
 // Visualization state types
 export interface VisualizationState {

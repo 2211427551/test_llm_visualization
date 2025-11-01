@@ -3,6 +3,7 @@
  * Manages animation playback state and controls
  */
 
+import React from 'react';
 import { create } from 'zustand';
 
 export interface Step {
@@ -36,7 +37,7 @@ interface PlaybackState {
   updateProgress: (delta: number) => void;
 }
 
-export const usePlaybackStore = create<PlaybackState>((set, get) => ({
+export const usePlaybackStore = create<PlaybackState>((set) => ({
   // Initial state
   isPlaying: false,
   currentStep: 0,
@@ -118,31 +119,27 @@ export const usePlaybackStore = create<PlaybackState>((set, get) => ({
 export function usePlaybackLoop(fps: number = 60) {
   const { isPlaying, updateProgress } = usePlaybackStore();
   
-  if (typeof window !== 'undefined') {
-    const frameTime = 1000 / fps;
-    let lastTime = Date.now();
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !isPlaying) return;
+    
+    let lastTime = performance.now();
     let animationFrameId: number;
     
     const loop = () => {
-      if (isPlaying) {
-        const currentTime = Date.now();
-        const delta = (currentTime - lastTime) / 1000; // Convert to seconds
-        lastTime = currentTime;
-        
-        updateProgress(delta);
-        animationFrameId = requestAnimationFrame(loop);
-      }
+      const currentTime = performance.now();
+      const delta = (currentTime - lastTime) / 1000; // Convert to seconds
+      lastTime = currentTime;
+      
+      updateProgress(delta);
+      animationFrameId = requestAnimationFrame(loop);
     };
     
-    if (isPlaying) {
-      lastTime = Date.now();
-      animationFrameId = requestAnimationFrame(loop);
-    }
+    animationFrameId = requestAnimationFrame(loop);
     
     return () => {
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }
+  }, [isPlaying, updateProgress, fps]);
 }
