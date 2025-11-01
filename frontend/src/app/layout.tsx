@@ -1,20 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { VisualizationProvider } from "@/contexts/VisualizationContext";
 import { AnimationProvider } from "@/contexts/AnimationContext";
 import { Toaster } from "@/components/ui/toaster";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
 
 export const metadata: Metadata = {
   title: "Transformer Visualization - Interactive Learning Platform",
@@ -40,7 +29,7 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <meta name="theme-color" content="#0ea5e9" />
       </head>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-slate-50 dark:bg-slate-900 min-h-screen`}>
+      <body className="font-sans antialiased bg-slate-50 dark:bg-slate-900 min-h-screen">
         <ThemeProvider>
           <VisualizationProvider>
             <AnimationProvider>
