@@ -2,22 +2,22 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# 安装系统依赖项
 RUN apt-get update && apt-get install -y \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# 为更好的缓存，先复制依赖项文件
 COPY requirements.txt .
 
-# Install Python dependencies
+# 安装 Python 依赖项
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# 复制应用程序代码
 COPY . .
 
-# Expose port
+# 暴露端口
 EXPOSE 8000
 
-# Run the application
+# 运行应用程序
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

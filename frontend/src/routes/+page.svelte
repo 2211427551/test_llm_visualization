@@ -2,21 +2,21 @@
   import { onMount } from 'svelte';
   
   onMount(() => {
-    console.log('LLM Visualization Advanced - Frontend loaded');
+    console.log('LLM 高级可视化 - 前端已加载');
   });
 </script>
 
 <main class="container mx-auto px-4 py-8">
   <header class="text-center mb-8">
-    <h1 class="text-4xl font-bold text-gray-900 mb-2">LLM Visualization Advanced</h1>
-    <p class="text-lg text-gray-600">Advanced visualization tools for Large Language Models</p>
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">LLM 高级可视化</h1>
+    <p class="text-lg text-gray-600">大语言模型的高级可视化工具</p>
   </header>
   
   <section class="bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-2xl font-semibold mb-4">Welcome</h2>
+    <h2 class="text-2xl font-semibold mb-4">欢迎</h2>
     <p class="text-gray-700">
-      This is the frontend application for LLM Visualization Advanced. 
-      The application is currently being scaffolded.
+      这是 LLM 高级可视化的前端应用程序。 
+      该应用程序目前正在搭建中。
     </p>
   </section>
 </main>

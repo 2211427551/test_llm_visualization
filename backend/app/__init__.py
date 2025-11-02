@@ -1,5 +1,5 @@
 """
-LLM Visualization Advanced Backend
+LLM 高级可视化后端
 """
 
 __version__ = "0.1.0"

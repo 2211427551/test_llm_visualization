@@ -1,119 +1,119 @@
-# LLM Visualization Advanced
+# LLM 高级可视化
 
-A comprehensive web application for visualizing and analyzing Large Language Models with advanced interactive components.
+一个用于可视化和分析大语言模型的综合性 Web 应用程序，具有高级交互组件。
 
-## Project Structure
+## 项目结构
 
 ```
 llm-viz-advanced/
-├── backend/                 # FastAPI Python backend
-│   ├── app/                # Application package
+├── backend/                 # FastAPI Python 后端
+│   ├── app/                # 应用程序包
 │   │   ├── __init__.py
-│   │   └── main.py         # FastAPI application entry point
-│   ├── requirements.txt    # Python dependencies
-│   └── Dockerfile         # Docker configuration
-├── frontend/               # Svelte + TypeScript frontend
+│   │   └── main.py         # FastAPI 应用程序入口点
+│   ├── requirements.txt    # Python 依赖项
+│   └── Dockerfile         # Docker 配置
+├── frontend/               # Svelte + TypeScript 前端
 │   ├── src/
-│   │   ├── routes/        # SvelteKit routes
-│   │   ├── app.html       # HTML template
-│   │   └── app.css        # Global styles
-│   ├── static/            # Static assets
-│   ├── package.json       # Node.js dependencies
-│   ├── svelte.config.js   # SvelteKit configuration
-│   ├── tsconfig.json      # TypeScript configuration
-│   ├── vite.config.ts     # Vite configuration
-│   ├── tailwind.config.js # Tailwind CSS configuration
-│   └── postcss.config.js  # PostCSS configuration
-└── README.md              # This file
+│   │   ├── routes/        # SvelteKit 路由
+│   │   ├── app.html       # HTML 模板
+│   │   └── app.css        # 全局样式
+│   ├── static/            # 静态资源
+│   ├── package.json       # Node.js 依赖项
+│   ├── svelte.config.js   # SvelteKit 配置
+│   ├── tsconfig.json      # TypeScript 配置
+│   ├── vite.config.ts     # Vite 配置
+│   ├── tailwind.config.js # Tailwind CSS 配置
+│   └── postcss.config.js  # PostCSS 配置
+└── README.md              # 本文件
 ```
 
-## Development Setup
+## 开发环境设置
 
-### Backend Setup
+### 后端设置
 
-1. Navigate to the backend directory:
+1. 导航到后端目录：
    ```bash
    cd backend
    ```
 
-2. Create a virtual environment (recommended):
+2. 创建虚拟环境（推荐）：
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate  # Windows: venv\Scripts\activate
    ```
 
-3. Install dependencies:
+3. 安装依赖项：
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Run the development server:
+4. 运行开发服务器：
    ```bash
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-The backend API will be available at `http://localhost:8000`
+后端 API 将在 `http://localhost:8000` 上可用
 
-### Frontend Setup
+### 前端设置
 
-1. Navigate to the frontend directory:
+1. 导航到前端目录：
    ```bash
    cd frontend
    ```
 
-2. Install dependencies:
+2. 安装依赖项：
    ```bash
    npm install
    ```
 
-3. Run the development server:
+3. 运行开发服务器：
    ```bash
    npm run dev
    ```
 
-The frontend application will be available at `http://localhost:5173`
+前端应用程序将在 `http://localhost:5173` 上可用
 
-### Docker Setup
+### Docker 设置
 
-#### Backend Docker
+#### 后端 Docker
 
-1. Navigate to the backend directory:
+1. 导航到后端目录：
    ```bash
    cd backend
    ```
 
-2. Build and run the Docker container:
+2. 构建并运行 Docker 容器：
    ```bash
    docker build -t llm-viz-backend .
    docker run -p 8000:8000 llm-viz-backend
    ```
 
-## Technology Stack
+## 技术栈
 
-### Backend
-- **FastAPI**: Modern, fast web framework for building APIs
-- **Uvicorn**: ASGI server for running FastAPI applications
-- **PyTorch**: Machine learning framework (placeholder)
-- **Transformers**: NLP library for transformer models (placeholder)
-- **NumPy & Pandas**: Data processing libraries
-- **Matplotlib & Plotly**: Visualization libraries
+### 后端
+- **FastAPI**: 用于构建 API 的现代、快速的 Web 框架
+- **Uvicorn**: 用于运行 FastAPI 应用程序的 ASGI 服务器
+- **PyTorch**: 机器学习框架（占位符）
+- **Transformers**: Transformer 模型的 NLP 库（占位符）
+- **NumPy & Pandas**: 数据处理库
+- **Matplotlib & Plotly**: 可视化库
 
-### Frontend
-- **SvelteKit**: Full-stack web framework built on Svelte
-- **TypeScript**: Type-safe JavaScript
-- **Tailwind CSS**: Utility-first CSS framework
-- **Vite**: Build tool and development server
-- **D3.js**: Data visualization library
+### 前端
+- **SvelteKit**: 基于 Svelte 构建的全栈 Web 框架
+- **TypeScript**: 类型安全的 JavaScript
+- **Tailwind CSS**: 实用优先的 CSS 框架
+- **Vite**: 构建工具和开发服务器
+- **D3.js**: 数据可视化库
 
-## API Endpoints
+## API 端点
 
-- `GET /` - Root endpoint
-- `GET /health` - Health check endpoint
+- `GET /` - 根端点
+- `GET /health` - 健康检查端点
 
-## Contributing
+## 贡献
 
-This project is currently under development. Please refer to the project documentation for contribution guidelines.
+本项目目前正在开发中。请参考项目文档了解贡献指南。
 
-## License
+## 许可证
 
-[Add license information here]
+[在此处添加许可证信息]

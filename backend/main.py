@@ -1,23 +1,23 @@
 """
-FastAPI application for LLM Visualization Advanced Backend
+LLM 高级可视化后端的 FastAPI 应用程序
 """
 
 from fastapi import FastAPI
 
 app = FastAPI(
-    title="LLM Visualization Advanced API",
-    description="Backend API for LLM visualization and analysis",
+    title="LLM 高级可视化 API",
+    description="用于 LLM 可视化和分析的后端 API",
     version="0.1.0"
 )
 
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
-    return {"message": "LLM Visualization Advanced API is running"}
+    """根端点"""
+    return {"message": "LLM 高级可视化 API 正在运行"}
 
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy"}
+    """健康检查端点"""
+    return {"status": "健康"}

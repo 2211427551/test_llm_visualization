@@ -1,20 +1,20 @@
-# Core FastAPI dependencies
+# 核心 FastAPI 依赖项
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 
-# ML/AI dependencies (placeholder)
+# 机器学习/人工智能 依赖项（占位符）
 torch>=2.0.0
 transformers>=4.35.0
 
-# Data processing
+# 数据处理
 numpy>=1.24.0
 pandas>=2.1.0
 
-# Visualization
+# 可视化
 matplotlib>=3.7.0
 plotly>=5.17.0
 
-# Development dependencies
+# 开发依赖项
 pytest>=7.4.0
 black>=23.0.0
 isort>=5.12.0
