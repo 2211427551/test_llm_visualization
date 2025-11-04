@@ -12,9 +12,11 @@ Transformer块实现
 
 from .attention import MultiHeadAttention
 from .mlp import FeedForward
+from .sparse_attention import SparseAttention, SparseAttentionConfig
 
 import torch
 import torch.nn as nn
+from typing import Optional
 
 
 class TransformerBlock(nn.Module):
@@ -48,9 +50,18 @@ class TransformerBlock(nn.Module):
         # 对输入进行归一化，提高训练稳定性
         self.ln_1 = nn.LayerNorm(self.n_embed)
         
-        # 2. 多头自注意力机制
-        # 核心的注意力计算模块
-        self.attn = MultiHeadAttention(config)
+        # 2. 注意力机制：根据配置选择标准注意力或稀疏注意力
+        if config.use_sparse_attention:
+            # 创建稀疏注意力配置
+            sparse_config = SparseAttentionConfig(
+                local_heads=config.n_head * 2 // 3,  # 2/3的头用于局部注意力
+                global_heads=config.n_head // 3,     # 1/3的头用于全局注意力
+                window_size=min(128, config.context_size // 4),
+                adaptive_window=True,
+            )
+            self.attn = SparseAttention(config, sparse_config)
+        else:
+            self.attn = MultiHeadAttention(config)
         
         # 3. 第二个层归一化：MLP前的归一化
         self.ln_2 = nn.LayerNorm(self.n_embed)
@@ -65,26 +76,35 @@ class TransformerBlock(nn.Module):
     def forward(
         self, 
         x: torch.Tensor, 
-        use_cache: bool = False
-    ) -> tuple[torch.Tensor, Optional[tuple[torch.Tensor, torch.Tensor]]]:
+        use_cache: bool = False,
+        return_intermediate: bool = False
+    ) -> tuple[torch.Tensor, Optional[tuple[torch.Tensor, torch.Tensor]], Optional[dict]]:
         """
         前向传播
         
         Args:
             x: 输入张量，形状为 (batch_size, seq_len, n_embed)
             use_cache: 是否使用键值缓存，用于推理加速
+            return_intermediate: 是否返回中间张量（仅对稀疏注意力有效）
             
         Returns:
             output: 输出张量，形状为 (batch_size, seq_len, n_embed)
             cache: 缓存的键值对，形状为 (batch_size, n_head, seq_len, head_dim)
+            intermediate: 中间张量字典（如果return_intermediate为True）
         """
         # 保存原始输入用于残差连接
         original_x = x
         
-        # 1. 第一个子层：多头自注意力
+        # 1. 第一个子层：注意力
         # Pre-LN: 先归一化，再注意力
         x = self.ln_1(x)
-        attn_output, cache = self.attn(x, use_cache=use_cache)
+        
+        # 根据注意力类型调用不同的前向传播
+        if isinstance(self.attn, SparseAttention):
+            attn_output, cache, intermediate = self.attn(x, use_cache=use_cache, return_intermediate=return_intermediate)
+        else:
+            attn_output, cache = self.attn(x, use_cache=use_cache)
+            intermediate = None
         
         # 残差连接 + dropout
         x = original_x + self.resid_dropout(attn_output)
@@ -100,7 +120,7 @@ class TransformerBlock(nn.Module):
         # 残差连接 + dropout
         x = attn_x + self.resid_dropout(mlp_output)
         
-        return x, cache
+        return x, cache, intermediate
     
     def clear_cache(self):
         """清除注意力层的缓存"""
