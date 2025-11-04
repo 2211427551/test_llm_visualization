@@ -48,10 +48,13 @@ class GPT2Config:
     # 前馈网络配置
     ffn_hidden_multiplier: int = 4  # 前馈网络隐藏层维度倍数
     
-    # 高级功能预留（为后续扩展做准备）
+    # 高级功能配置
     use_sparse_attention: bool = False  # 稀疏注意力开关
-    moe_num_experts: Optional[int] = None  # MoE专家数量
-    moe_top_k: Optional[int] = None  # MoE路由top-k
+    use_moe: bool = False  # MoE开关
+    moe_num_experts: int = 8  # MoE专家数量
+    moe_top_k: int = 2  # MoE路由top-k
+    moe_activation: str = "gelu"  # MoE专家激活函数类型
+    moe_dropout: Optional[float] = None  # MoE专用dropout，None则使用全局dropout
     
     def __post_init__(self):
         """配置验证，确保参数的合理性"""
@@ -62,11 +65,19 @@ class GPT2Config:
             )
         
         # 验证MoE配置的合理性
-        if self.moe_num_experts is not None and self.moe_top_k is not None:
+        if self.use_moe:
             if self.moe_top_k > self.moe_num_experts:
                 raise ValueError(
                     f"MoE的top_k ({self.moe_top_k}) 不能大于专家数量 ({self.moe_num_experts})"
                 )
+            if self.moe_num_experts <= 0:
+                raise ValueError(f"MoE专家数量必须大于0，当前为{self.moe_num_experts}")
+            if self.moe_top_k <= 0:
+                raise ValueError(f"MoE top_k必须大于0，当前为{self.moe_top_k}")
+            if self.moe_activation not in ["gelu", "relu", "swish", "tanh"]:
+                raise ValueError(f"不支持的激活函数: {self.moe_activation}")
+            if self.moe_dropout is not None and (self.moe_dropout < 0 or self.moe_dropout >= 1):
+                raise ValueError(f"MoE dropout必须在[0, 1)范围内，当前为{self.moe_dropout}")
     
     @property
     def head_dim(self) -> int:
