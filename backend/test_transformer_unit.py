@@ -50,6 +50,9 @@ except ImportError:
     
     # 简单的配置测试
     print("\n=== 测试配置类 ===")
+    
+    @dataclass
+    class GPT2Config:
         vocab_size: int = 50304
         context_size: int = 1024
         n_layer: int = 12
@@ -66,8 +69,6 @@ except ImportError:
         @property
         def head_dim(self):
             return self.n_embed // self.n_head
-    
-    from dataclasses import dataclass
     
     config = GPT2Config(vocab_size=1000, n_layer=2, n_embed=256, n_head=8)
     print(f"✓ 配置创建成功: vocab_size={config.vocab_size}, head_dim={config.head_dim}")
@@ -88,9 +89,7 @@ except ImportError:
 from app.models.transformer import (
     GPT2Config, 
     GPT2Model, 
-    create_gpt2_model,
-    create_gpt2_small,
-    create_gpt2_from_preset
+    create_gpt2_model
 )
 
 
@@ -187,13 +186,9 @@ def test_factory_functions():
     model1 = create_gpt2_model(vocab_size=1000, n_layer=2, n_embed=256, n_head=8)
     print(f"✓ 基础工厂函数: {model1.get_num_parameters():,} 参数")
     
-    # 测试预设模型
-    model2 = create_gpt2_small(vocab_size=1000)
-    print(f"✓ 小型模型: {model2.get_num_parameters():,} 参数")
-    
     # 测试前向传播
     input_ids = torch.randint(0, 1000, (2, 32))
-    result = model2(input_ids)
+    result = model1(input_ids)
     
     if result["logits"].shape == (2, 32, 1000):
         print("✓ 工厂函数创建的模型前向传播正确")

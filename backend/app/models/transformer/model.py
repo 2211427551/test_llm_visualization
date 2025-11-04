@@ -99,7 +99,8 @@ class GPT2Model(nn.Module):
         self, 
         input_ids: torch.Tensor,
         use_cache: bool = False,
-        return_cache: bool = False
+        return_cache: bool = False,
+        return_intermediate: bool = False
     ) -> dict[str, torch.Tensor]:
         """
         前向传播
@@ -108,11 +109,13 @@ class GPT2Model(nn.Module):
             input_ids: 输入token序列，形状为 (batch_size, seq_len)
             use_cache: 是否使用键值缓存（用于推理加速）
             return_cache: 是否返回缓存
+            return_intermediate: 是否返回中间张量（仅对稀疏注意力有效）
             
         Returns:
             dict包含：
             - logits: 输出logits，形状为 (batch_size, seq_len, vocab_size)
             - cache: 可选，键值缓存列表
+            - intermediate: 可选，中间张量字典列表
         """
         batch_size, seq_len = input_ids.size()
         
@@ -128,13 +131,21 @@ class GPT2Model(nn.Module):
         
         # 2. 通过Transformer块
         caches = [] if return_cache else None
+        intermediate_tensors = [] if return_intermediate else None
         
         for i, block in enumerate(self.transformer_blocks):
-            # 每个块都返回隐藏状态和可选的缓存
-            hidden_states, block_cache = block(hidden_states, use_cache=use_cache)
+            # 每个块都返回隐藏状态、可选的缓存和中间张量
+            hidden_states, block_cache, block_intermediate = block(
+                hidden_states, 
+                use_cache=use_cache, 
+                return_intermediate=return_intermediate
+            )
             
             if return_cache and block_cache is not None:
                 caches.append(block_cache)
+            
+            if return_intermediate and block_intermediate is not None:
+                intermediate_tensors.append(block_intermediate)
         
         # 3. 最终层归一化
         hidden_states = self.ln_f(hidden_states)
@@ -146,6 +157,8 @@ class GPT2Model(nn.Module):
         result = {"logits": logits}
         if return_cache:
             result["cache"] = caches
+        if return_intermediate:
+            result["intermediate"] = intermediate_tensors
         
         return result
     
