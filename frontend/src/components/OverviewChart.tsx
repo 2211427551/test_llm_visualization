@@ -70,9 +70,7 @@ const OverviewChart = () => {
       .attr('stop-color', accentEnd)
       .attr('stop-opacity', 0.2)
 
-    const container = svg
-      .append('g')
-      .attr('transform', `translate(${MARGINS.left},${MARGINS.top})`)
+    const container = svg.append('g').attr('transform', `translate(${MARGINS.left},${MARGINS.top})`)
 
     const x = d3
       .scaleBand<string>()
@@ -97,10 +95,7 @@ const OverviewChart = () => {
           .tickFormat(() => ''),
       )
 
-    grid
-      .selectAll('line')
-      .attr('stroke', gridColor)
-      .attr('stroke-dasharray', '4,8')
+    grid.selectAll('line').attr('stroke', gridColor).attr('stroke-dasharray', '4,8')
 
     grid.selectAll('path').attr('stroke', 'transparent')
 
