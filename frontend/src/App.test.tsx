@@ -17,5 +17,6 @@ describe('App', () => {
 
     expect(screen.getByText(/欢迎回来/)).toBeInTheDocument()
     expect(screen.getByRole('img', { name: /七日访问量趋势/ })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /Transformer 模型结构/ })).toBeInTheDocument()
   })
 })

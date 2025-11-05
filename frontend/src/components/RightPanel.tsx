@@ -1,141 +1,134 @@
 import DataPanel from './DataPanel'
+import TensorHeatmap from './visualizations/TensorHeatmap'
+import SparseAttentionMatrix from './visualizations/SparseAttentionMatrix'
+import MoERoutingDiagram from './visualizations/MoERoutingDiagram'
+import { useVisualizationState } from '../hooks/useVisualizationState'
+import type { LayerType } from '../types/visualization'
+
+const layerTypeLabelMap: Record<LayerType, string> = {
+  input: '输入层',
+  embedding: '嵌入层',
+  attention: '注意力层',
+  feedforward: '前馈层',
+  output: '输出层',
+}
 
 const RightPanel = () => {
-  // Placeholder data for tensor heatmap
-  const renderTensorHeatmap = () => {
-    const rows = 8
-    const cols = 8
-    const data = Array.from({ length: rows }, () =>
-      Array.from({ length: cols }, () => Math.random()),
-    )
+  const { currentStep, currentStepIndex, stepCount, selectedLayer } = useVisualizationState()
 
+  if (!selectedLayer) {
     return (
-      <div className="space-y-2">
-        <div className="text-xs text-slate-600 dark:text-slate-400">张量维度: [8, 8]</div>
-        <div className="grid grid-cols-8 gap-0.5">
-          {data.map((row, i) =>
-            row.map((value, j) => (
-              <div
-                key={`${i}-${j}`}
-                className="aspect-square rounded-sm"
-                style={{
-                  backgroundColor: `rgba(59, 130, 246, ${value})`, // Blue gradient
-                }}
-                title={`[${i},${j}]: ${value.toFixed(3)}`}
-              />
-            )),
-          )}
+      <div className="flex h-full flex-col gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">细节展示</h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            请选择任意 Transformer 层以查看对应的张量、注意力与路由信息。
+          </p>
         </div>
-        <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-          <span>0.0</span>
-          <span>张量热力图</span>
-          <span>1.0</span>
+        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center text-sm text-slate-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300">
+          暂无数据。
         </div>
       </div>
     )
   }
 
-  // Placeholder data for attention matrix
-  const renderAttentionMatrix = () => {
-    const size = 6
-    const data = Array.from({ length: size }, (_, i) =>
-      Array.from({ length: size }, (_, j) => {
-        // Create some pattern in the attention matrix
-        if (i === j) return 0.8 // Self-attention
-        if (Math.abs(i - j) === 1) return 0.4 // Adjacent attention
-        return Math.random() * 0.2
-      }),
-    )
-
-    return (
-      <div className="space-y-2">
-        <div className="text-xs text-slate-600 dark:text-slate-400">注意力矩阵: [6, 6]</div>
-        <div className="grid grid-cols-6 gap-0.5">
-          {data.map((row, i) =>
-            row.map((value, j) => (
-              <div
-                key={`${i}-${j}`}
-                className="aspect-square rounded-sm"
-                style={{
-                  backgroundColor: `rgba(168, 85, 247, ${value})`, // Purple gradient
-                }}
-                title={`Attention[${i},${j}]: ${value.toFixed(3)}`}
-              />
-            )),
-          )}
-        </div>
-        <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-          <span>0.0</span>
-          <span>注意力权重</span>
-          <span>1.0</span>
-        </div>
-      </div>
-    )
-  }
-
-  // Placeholder data for MoE routing information
-  const renderMoERouting = () => {
-    const experts = ['专家 1', '专家 2', '专家 3', '专家 4']
-    const routingWeights = [0.35, 0.25, 0.25, 0.15]
-
-    return (
-      <div className="space-y-3">
-        <div className="text-xs text-slate-600 dark:text-slate-400">MoE 路由信息</div>
-        <div className="space-y-2">
-          {experts.map((expert, i) => (
-            <div key={expert} className="space-y-1">
-              <div className="flex justify-between text-xs">
-                <span className="text-slate-700 dark:text-slate-300">{expert}</span>
-                <span className="text-slate-600 dark:text-slate-400">
-                  {(routingWeights[i] * 100).toFixed(1)}%
-                </span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-700">
-                <div
-                  className="h-2 rounded-full bg-gradient-to-r from-primary to-secondary"
-                  style={{ width: `${routingWeights[i] * 100}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 rounded-lg bg-slate-50 p-2 dark:bg-slate-700">
-          <div className="text-xs text-slate-600 dark:text-slate-400">
-            <div>总负载: 100%</div>
-            <div>激活专家数: 2/4</div>
-            <div>负载均衡系数: 1.23</div>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const layerTypeLabel = layerTypeLabelMap[selectedLayer.type] ?? selectedLayer.type
 
   return (
     <div className="flex h-full flex-col gap-4">
-      {/* Header */}
       <div>
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">细节展示</h2>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">模型运行时的详细信息</p>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          动态渲染张量热力图、稀疏注意力与 MoE 路由，支持步骤逐帧切换。
+        </p>
       </div>
 
-      {/* Data Panels */}
-      <div className="flex-1 space-y-4 overflow-y-auto">
-        {/* Tensor Heatmap Panel */}
+      <div
+        className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              步骤 {currentStepIndex + 1}/{stepCount} · {currentStep.name}
+            </p>
+            <p className="text-base font-semibold text-slate-900 dark:text-slate-50">当前层：{selectedLayer.name}</p>
+          </div>
+          <span className="text-xs text-slate-500 dark:text-slate-400">{layerTypeLabel}</span>
+        </div>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{selectedLayer.summary}</p>
+        {selectedLayer.sparseAttention?.note && (
+          <p className="mt-2 rounded-md bg-slate-100 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
+            {selectedLayer.sparseAttention.note}
+          </p>
+        )}
+        {selectedLayer.moeRouting?.description && (
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{selectedLayer.moeRouting.description}</p>
+        )}
+      </div>
+
+      <div className="flex-1 space-y-4 overflow-y-auto" role="region" aria-label="层级数据详情">
         <DataPanel title="张量热力图" scrollable={false}>
-          {renderTensorHeatmap()}
+          <div className="space-y-2">
+            <TensorHeatmap data={selectedLayer.tensorHeatmap} ariaLabel={`张量热力图 · ${selectedLayer.name}`} />
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <span>0.0</span>
+              <span>权重热度</span>
+              <span>1.0</span>
+            </div>
+          </div>
         </DataPanel>
 
-        {/* Attention Matrix Panel */}
-        <DataPanel title="注意力矩阵" scrollable={false}>
-          {renderAttentionMatrix()}
+        <DataPanel title="稀疏注意力矩阵" scrollable={false}>
+          {selectedLayer.sparseAttention ? (
+            <div className="space-y-3">
+              <SparseAttentionMatrix
+                data={selectedLayer.sparseAttention}
+                ariaLabel={`稀疏注意力矩阵 · ${selectedLayer.name}`}
+              />
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                <span className="flex items-center gap-1">
+                  <span
+                    className="inline-block h-3 w-3 rounded-sm border border-slate-300"
+                    style={{ backgroundColor: '#e2e8f0' }}
+                    aria-hidden="true"
+                  />
+                  稀疏区域
+                </span>
+                <span className="flex items-center gap-1">
+                  <span
+                    className="inline-block h-3 w-3 rounded-sm border border-purple-400"
+                    style={{ backgroundColor: '#c084fc' }}
+                    aria-hidden="true"
+                  />
+                  活跃连接
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-500 dark:text-slate-400">本层不包含稀疏注意力权重。</p>
+          )}
         </DataPanel>
 
-        {/* MoE Routing Panel */}
-        <DataPanel title="MoE 路由信息" scrollable={true}>
-          {renderMoERouting()}
+        <DataPanel title="MoE 路由信息" scrollable={false}>
+          {selectedLayer.moeRouting ? (
+            <div className="space-y-3">
+              <MoERoutingDiagram
+                data={selectedLayer.moeRouting}
+                ariaLabel={`MoE 路由流向图 · ${selectedLayer.name}`}
+              />
+              <div className="rounded-md bg-slate-100 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
+                <p>令牌数：{selectedLayer.moeRouting.tokens.length}</p>
+                <p>专家数：{selectedLayer.moeRouting.experts.length}</p>
+                <p>总路由：{selectedLayer.moeRouting.routes.length}</p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-500 dark:text-slate-400">本层未启用混合专家路由。</p>
+          )}
         </DataPanel>
 
-        {/* Additional Info Panel */}
         <DataPanel title="运行统计" defaultExpanded={false}>
           <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
             <div className="flex justify-between">
