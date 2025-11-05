@@ -53,12 +53,13 @@ class Embeddings(nn.Module):
         # Dropout层，用于嵌入的正则化
         self.drop = nn.Dropout(self.dropout)
     
-    def forward(self, input_ids: torch.Tensor) -> torch.Tensor:
+    def forward(self, input_ids: torch.Tensor, capture_container=None) -> torch.Tensor:
         """
         前向传播
         
         Args:
             input_ids: 输入token ID序列，形状为 (batch_size, seq_len)
+            capture_container: 可选的数据捕获容器
             
         Returns:
             embeddings: 融合了词嵌入和位置编码的嵌入向量，
@@ -84,6 +85,15 @@ class Embeddings(nn.Module):
         
         # 4. 应用dropout
         embeddings = self.drop(embeddings)
+        
+        # 5. 数据捕获（如果提供了捕获容器）
+        if capture_container is not None:
+            capture_container.捕获嵌入数据(
+                input_ids=input_ids,
+                token_embeddings=token_embeddings,
+                position_embeddings=position_embeddings,
+                final_embeddings=embeddings
+            )
         
         return embeddings
     

@@ -100,7 +100,8 @@ class GPT2Model(nn.Module):
         input_ids: torch.Tensor,
         use_cache: bool = False,
         return_cache: bool = False,
-        return_intermediate: bool = False
+        return_intermediate: bool = False,
+        capture_container=None
     ) -> dict[str, torch.Tensor]:
         """
         前向传播
@@ -110,12 +111,14 @@ class GPT2Model(nn.Module):
             use_cache: 是否使用键值缓存（用于推理加速）
             return_cache: 是否返回缓存
             return_intermediate: 是否返回中间张量（仅对稀疏注意力有效）
+            capture_container: 可选的数据捕获容器
             
         Returns:
             dict包含：
             - logits: 输出logits，形状为 (batch_size, seq_len, vocab_size)
             - cache: 可选，键值缓存列表
             - intermediate: 可选，中间张量字典列表
+            - trajectory: 可选，完整的前向传播轨迹（如果提供了capture_container）
         """
         batch_size, seq_len = input_ids.size()
         
@@ -127,7 +130,7 @@ class GPT2Model(nn.Module):
         
         # 1. 嵌入层处理
         # 输出: (batch_size, seq_len, n_embed)
-        hidden_states = self.embeddings(input_ids)
+        hidden_states = self.embeddings(input_ids, capture_container=capture_container)
         
         # 2. 通过Transformer块
         caches = [] if return_cache else None
@@ -138,7 +141,9 @@ class GPT2Model(nn.Module):
             hidden_states, block_cache, block_intermediate = block(
                 hidden_states, 
                 use_cache=use_cache, 
-                return_intermediate=return_intermediate
+                return_intermediate=return_intermediate,
+                layer_idx=i,
+                capture_container=capture_container
             )
             
             if return_cache and block_cache is not None:
@@ -154,11 +159,59 @@ class GPT2Model(nn.Module):
         # 输出: (batch_size, seq_len, vocab_size)
         logits = self.lm_head(hidden_states)
         
+        # 5. 捕获最终输出数据
+        if capture_container is not None:
+            capture_container.捕获最终输出(logits)
+        
         result = {"logits": logits}
         if return_cache:
             result["cache"] = caches
         if return_intermediate:
             result["intermediate"] = intermediate_tensors
+        if capture_container is not None:
+            # 生成完整的前向传播轨迹
+            result["trajectory"] = capture_container.生成完整轨迹(self, input_ids)
+        
+        return result
+    
+    def forward_with_capture(
+        self,
+        input_ids: torch.Tensor,
+        capture_config=None,
+        use_cache: bool = False,
+        return_cache: bool = False,
+        return_intermediate: bool = False
+    ) -> dict[str, torch.Tensor]:
+        """
+        带数据捕获的前向传播
+        
+        Args:
+            input_ids: 输入token序列，形状为 (batch_size, seq_len)
+            capture_config: 数据捕获配置
+            use_cache: 是否使用键值缓存
+            return_cache: 是否返回缓存
+            return_intermediate: 是否返回中间张量
+            
+        Returns:
+            包含标准输出和捕获数据的字典
+        """
+        from ...services.forward_capture import 数据捕获容器
+        
+        # 创建数据捕获容器
+        capture_container = 数据捕获容器(self.config, capture_config)
+        
+        # 使用捕获上下文执行前向传播
+        with capture_container.捕获上下文():
+            result = self.forward(
+                input_ids=input_ids,
+                use_cache=use_cache,
+                return_cache=return_cache,
+                return_intermediate=return_intermediate,
+                capture_container=capture_container
+            )
+        
+        # 添加性能统计
+        result["capture_stats"] = capture_container.获取性能统计()
         
         return result
     

@@ -77,7 +77,9 @@ class TransformerBlock(nn.Module):
         self, 
         x: torch.Tensor, 
         use_cache: bool = False,
-        return_intermediate: bool = False
+        return_intermediate: bool = False,
+        layer_idx: int = 0,
+        capture_container=None
     ) -> tuple[torch.Tensor, Optional[tuple[torch.Tensor, torch.Tensor]], Optional[dict]]:
         """
         前向传播
@@ -86,6 +88,8 @@ class TransformerBlock(nn.Module):
             x: 输入张量，形状为 (batch_size, seq_len, n_embed)
             use_cache: 是否使用键值缓存，用于推理加速
             return_intermediate: 是否返回中间张量（仅对稀疏注意力有效）
+            layer_idx: 当前层的索引，用于数据捕获
+            capture_container: 可选的数据捕获容器
             
         Returns:
             output: 输出张量，形状为 (batch_size, seq_len, n_embed)
@@ -102,9 +106,26 @@ class TransformerBlock(nn.Module):
         # 根据注意力类型调用不同的前向传播
         if isinstance(self.attn, SparseAttention):
             attn_output, cache, intermediate = self.attn(x, use_cache=use_cache, return_intermediate=return_intermediate)
+            
+            # 捕获稀疏注意力数据
+            if capture_container is not None:
+                capture_container.捕获稀疏注意力数据(
+                    layer_idx=layer_idx,
+                    attention_type="稀疏注意力",
+                    attention_output=attn_output,
+                    intermediate_data=intermediate
+                )
         else:
             attn_output, cache = self.attn(x, use_cache=use_cache)
             intermediate = None
+            
+            # 捕获标准注意力数据
+            if capture_container is not None:
+                capture_container.捕获标准层数据(
+                    layer_idx=layer_idx,
+                    layer_output=attn_output,
+                    layer_type="标准注意力"
+                )
         
         # 残差连接 + dropout
         x = original_x + self.resid_dropout(attn_output)
@@ -115,7 +136,35 @@ class TransformerBlock(nn.Module):
         # 2. 第二个子层：前馈神经网络
         # Pre-LN: 先归一化，再MLP
         x = self.ln_2(x)
-        mlp_output = self.mlp(x)
+        
+        # 检查是否是MoE层
+        mlp_class_name = self.mlp.__class__.__name__
+        if 'MoE' in mlp_class_name or hasattr(self.mlp, 'experts'):
+            # MoE前向传播
+            if hasattr(self.mlp, 'forward') and 'return_intermediate' in self.mlp.forward.__code__.co_varnames:
+                mlp_output, moe_intermediate = self.mlp(x, return_intermediate=True)
+            else:
+                mlp_output = self.mlp(x)
+                moe_intermediate = None
+            
+            # 捕获MoE数据
+            if capture_container is not None:
+                capture_container.捕获MoE路由数据(
+                    layer_idx=layer_idx,
+                    moe_output=mlp_output,
+                    intermediate_data=moe_intermediate
+                )
+        else:
+            # 标准MLP前向传播
+            mlp_output = self.mlp(x)
+            
+            # 捕获标准MLP数据
+            if capture_container is not None:
+                capture_container.捕获标准层数据(
+                    layer_idx=layer_idx,
+                    layer_output=mlp_output,
+                    layer_type="标准MLP"
+                )
         
         # 残差连接 + dropout
         x = attn_x + self.resid_dropout(mlp_output)
