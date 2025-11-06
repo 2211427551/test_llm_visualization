@@ -7,8 +7,15 @@ import {
   useMemo,
   useState,
 } from 'react'
-import visualizationSteps from '../data/visualizationData'
+import defaultSteps from '../data/visualizationData'
+import type { VisualizationRuntimeSummary } from '../types/api'
 import type { LayerVisualizationData, StepVisualizationData } from '../types/visualization'
+
+interface VisualizationPayload {
+  steps: StepVisualizationData[]
+  runtime?: VisualizationRuntimeSummary
+  tokenSequence?: string[]
+}
 
 interface VisualizationContextValue {
   steps: StepVisualizationData[]
@@ -26,6 +33,10 @@ interface VisualizationContextValue {
   setStepById: (stepId: string) => void
   selectLayer: (layerId: string) => void
   isLayerSelected: (layerId: string) => boolean
+  updateVisualization: (payload: VisualizationPayload) => void
+  resetVisualization: () => void
+  runtimeSummary: VisualizationRuntimeSummary | null
+  tokenSequence: string[]
 }
 
 const VisualizationContext = createContext<VisualizationContextValue | undefined>(undefined)
@@ -33,33 +44,24 @@ const VisualizationContext = createContext<VisualizationContextValue | undefined
 const clampIndex = (index: number, upperBound: number) => Math.max(0, Math.min(index, upperBound))
 
 export const VisualizationProvider = ({ children }: PropsWithChildren) => {
+  const [steps, setSteps] = useState<StepVisualizationData[]>(defaultSteps)
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(() => {
-    const firstLayer = visualizationSteps[0]?.layers[0]
+    const firstLayer = defaultSteps[0]?.layers[0]
     return firstLayer?.id ?? null
   })
+  const [runtimeSummary, setRuntimeSummary] = useState<VisualizationRuntimeSummary | null>(null)
+  const [tokenSequence, setTokenSequence] = useState<string[]>([])
 
-  const steps = visualizationSteps
   const stepCount = steps.length
   const upperBound = Math.max(0, stepCount - 1)
 
-  const currentStep = steps[currentStepIndex] ?? steps[0]
+  useEffect(() => {
+    setCurrentStepIndex((prev) => clampIndex(prev, upperBound))
+  }, [upperBound])
+
+  const currentStep = steps[currentStepIndex] ?? steps[0] ?? defaultSteps[0]
   const currentStepId = currentStep?.id ?? ''
-
-  const selectedLayer = useMemo(() => {
-    if (!currentStep) {
-      return null
-    }
-
-    if (selectedLayerId) {
-      const match = currentStep.layers.find((layer) => layer.id === selectedLayerId)
-      if (match) {
-        return match
-      }
-    }
-
-    return currentStep.layers[0] ?? null
-  }, [currentStep, selectedLayerId])
 
   useEffect(() => {
     if (!currentStep) {
@@ -116,6 +118,45 @@ export const VisualizationProvider = ({ children }: PropsWithChildren) => {
     [selectedLayerId],
   )
 
+  const selectedLayer = useMemo(() => {
+    if (!currentStep) {
+      return null
+    }
+
+    if (selectedLayerId) {
+      const match = currentStep.layers.find((layer) => layer.id === selectedLayerId)
+      if (match) {
+        return match
+      }
+    }
+
+    return currentStep.layers[0] ?? null
+  }, [currentStep, selectedLayerId])
+
+  const updateVisualization = useCallback((payload: VisualizationPayload) => {
+    setSteps((prev) => {
+      const nextSteps = payload.steps.length > 0 ? payload.steps : defaultSteps
+      const fallbackLayerId = nextSteps[0]?.layers[0]?.id ?? null
+      if (fallbackLayerId !== selectedLayerId) {
+        setSelectedLayerId(fallbackLayerId)
+      }
+      if (prev !== nextSteps) {
+        setCurrentStepIndex(0)
+      }
+      setRuntimeSummary(payload.runtime ?? null)
+      setTokenSequence(payload.tokenSequence ?? [])
+      return nextSteps
+    })
+  }, [selectedLayerId])
+
+  const resetVisualization = useCallback(() => {
+    setSteps(defaultSteps)
+    setCurrentStepIndex(0)
+    setSelectedLayerId(defaultSteps[0]?.layers[0]?.id ?? null)
+    setRuntimeSummary(null)
+    setTokenSequence([])
+  }, [])
+
   const value = useMemo<VisualizationContextValue>(() => {
     const canGoToPrevious = currentStepIndex > 0
     const canGoToNext = currentStepIndex < upperBound
@@ -136,20 +177,29 @@ export const VisualizationProvider = ({ children }: PropsWithChildren) => {
       setStepById,
       selectLayer,
       isLayerSelected,
+      updateVisualization,
+      resetVisualization,
+      runtimeSummary,
+      tokenSequence,
     }
   }, [
+    canGoToNext,
     currentStep,
     currentStepId,
     currentStepIndex,
     goToNextStep,
     goToPreviousStep,
     isLayerSelected,
+    resetVisualization,
+    runtimeSummary,
     selectedLayer,
     selectedLayerId,
     setStepById,
     setStepByIndex,
-    stepCount,
     steps,
+    stepCount,
+    tokenSequence,
+    updateVisualization,
     upperBound,
   ])
 

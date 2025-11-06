@@ -1,1 +1,3 @@
-# 空文件，用于使 services 成为一个 Python 包
+from .inference import model_inference_service
+
+__all__ = ["model_inference_service"]

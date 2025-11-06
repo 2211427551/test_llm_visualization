@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { easeCubicInOut, scaleLinear, scalePoint, select } from 'd3'
+import { limitMoERouting } from '../../utils/dataTransform'
 import type { MoERoutingData } from '../../types/visualization'
 
 interface MoERoutingDiagramProps {
@@ -15,20 +16,21 @@ type ExpertDatum = MoERoutingData['experts'][number]
 
 const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERoutingDiagramProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null)
+  const processedData = useMemo(() => limitMoERouting(data), [data])
 
   const helpers = useMemo(() => {
-    const tokenMap = new Map(data.tokens.map((token) => [token.id, token.label]))
-    const expertMap = new Map(data.experts.map((expert) => [expert.id, expert.label]))
+    const tokenMap = new Map(processedData.tokens.map((token) => [token.id, token.label]))
+    const expertMap = new Map(processedData.experts.map((expert) => [expert.id, expert.label]))
     return { tokenMap, expertMap }
-  }, [data.experts, data.tokens])
+  }, [processedData.experts, processedData.tokens])
 
   useEffect(() => {
     if (!svgRef.current) {
       return
     }
 
-    const tokenCount = data.tokens.length
-    const expertCount = data.experts.length
+    const tokenCount = processedData.tokens.length
+    const expertCount = processedData.experts.length
     const height = Math.max(tokenCount, expertCount) * 64 + 80
     const width = 420
     const leftX = 80
@@ -38,16 +40,16 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
     svg.attr('viewBox', `0 0 ${width} ${height}`)
 
     const tokenScale = scalePoint<string>()
-      .domain(data.tokens.map((token) => token.id))
+      .domain(processedData.tokens.map((token) => token.id))
       .range([40, height - 40])
       .padding(0.5)
 
     const expertScale = scalePoint<string>()
-      .domain(data.experts.map((expert) => expert.id))
+      .domain(processedData.experts.map((expert) => expert.id))
       .range([40, height - 40])
       .padding(0.5)
 
-    const maxWeight = data.routes.reduce((acc, route) => Math.max(acc, route.weight), 0)
+    const maxWeight = processedData.routes.reduce((acc, route) => Math.max(acc, route.weight), 0)
     const weightScale = scaleLinear().domain([0, maxWeight || 1]).range([1, 14])
 
     const createRoutePath = (route: RouteDatum) => {
@@ -60,7 +62,7 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
     const routes = svg.selectAll<SVGPathElement, RouteDatum>('path.route')
 
     const mergedRoutes = routes
-      .data(data.routes, (route) => `${route.tokenId}-${route.expertId}`)
+      .data(processedData.routes, (route) => `${route.tokenId}-${route.expertId}`)
       .join(
         (enter) =>
           enter
@@ -152,9 +154,9 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
       mergedGroups.select('title').text((item) => ('label' in item ? item.label : item.id))
     }
 
-    renderNodes<TokenDatum>('g.token-node', data.tokens, leftX, tokenScale, '#bae6fd')
-    renderNodes<ExpertDatum>('g.expert-node', data.experts, rightX, expertScale, '#c4b5fd')
-  }, [data, helpers])
+    renderNodes<TokenDatum>('g.token-node', processedData.tokens, leftX, tokenScale, '#bae6fd')
+    renderNodes<ExpertDatum>('g.expert-node', processedData.experts, rightX, expertScale, '#c4b5fd')
+  }, [helpers, processedData])
 
   return <svg ref={svgRef} role="img" aria-label={ariaLabel} className="h-auto w-full" focusable="false" />
 }

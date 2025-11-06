@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { interpolateBlues, scaleLinear, select } from 'd3'
+import { downsampleMatrix } from '../../utils/dataTransform'
 
 interface TensorHeatmapProps {
   data: number[][]
@@ -14,14 +15,18 @@ interface HeatmapCell {
 
 const TensorHeatmap = ({ data, ariaLabel = '张量热力图' }: TensorHeatmapProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null)
+  const processedData = useMemo(() => downsampleMatrix(data), [data])
 
   useEffect(() => {
-    if (!svgRef.current || data.length === 0 || data[0].length === 0) {
+    if (!svgRef.current || processedData.length === 0 || processedData[0].length === 0) {
+      if (svgRef.current) {
+        select(svgRef.current).selectAll('*').remove()
+      }
       return
     }
 
-    const rows = data.length
-    const cols = data[0].length
+    const rows = processedData.length
+    const cols = processedData[0].length
     const cellSize = Math.max(Math.min(30, 240 / Math.max(rows, cols)), 16)
     const width = cols * cellSize
     const height = rows * cellSize
@@ -31,7 +36,7 @@ const TensorHeatmap = ({ data, ariaLabel = '张量热力图' }: TensorHeatmapPro
 
     const intensityScale = scaleLinear().domain([0, 1]).range([0.1, 0.95])
 
-    const flattened: HeatmapCell[] = data.flatMap((row, rowIndex) =>
+    const flattened: HeatmapCell[] = processedData.flatMap((row, rowIndex) =>
       row.map((value, columnIndex) => ({ rowIndex, columnIndex, value })),
     )
 
@@ -68,7 +73,7 @@ const TensorHeatmap = ({ data, ariaLabel = '张量热力图' }: TensorHeatmapPro
       .attr('fill', (d) => interpolateBlues(intensityScale(d.value)))
 
     joined.select('title').text((d) => `位置 [${d.rowIndex + 1}, ${d.columnIndex + 1}] · 值 ${d.value.toFixed(3)}`)
-  }, [data])
+  }, [processedData])
 
   return (
     <svg ref={svgRef} role="img" aria-label={ariaLabel} className="h-auto w-full" focusable="false" />

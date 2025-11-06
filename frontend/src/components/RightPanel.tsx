@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import DataPanel from './DataPanel'
 import TensorHeatmap from './visualizations/TensorHeatmap'
 import SparseAttentionMatrix from './visualizations/SparseAttentionMatrix'
@@ -14,7 +15,35 @@ const layerTypeLabelMap: Record<LayerType, string> = {
 }
 
 const RightPanel = () => {
-  const { currentStep, currentStepIndex, stepCount, selectedLayer } = useVisualizationState()
+  const { currentStep, currentStepIndex, stepCount, selectedLayer, runtimeSummary, tokenSequence } =
+    useVisualizationState()
+
+  const runtimeMetrics = useMemo(
+    () =>
+      runtimeSummary
+        ? [
+            { label: '前向传播时间', value: `${runtimeSummary.forwardTimeMs.toFixed(2)} ms` },
+            { label: '内存使用', value: `${runtimeSummary.memoryMB.toFixed(1)} MB` },
+            {
+              label: 'GPU 利用率',
+              value: `${Math.round(runtimeSummary.gpuUtilization * 100)}%`,
+            },
+            { label: '批处理大小', value: runtimeSummary.batchSize },
+            { label: '序列长度', value: runtimeSummary.sequenceLength },
+            { label: 'Logits 形状', value: runtimeSummary.logitsShape.join(' × ') },
+          ]
+        : [
+            { label: '前向传播时间', value: '--' },
+            { label: '内存使用', value: '--' },
+            { label: 'GPU 利用率', value: '--' },
+            { label: '批处理大小', value: '--' },
+            { label: '序列长度', value: '--' },
+            { label: 'Logits 形状', value: '--' },
+          ],
+    [runtimeSummary],
+  )
+
+  const displayedTokens = useMemo(() => tokenSequence.slice(0, 24), [tokenSequence])
 
   if (!selectedLayer) {
     return (
@@ -129,29 +158,40 @@ const RightPanel = () => {
           )}
         </DataPanel>
 
-        <DataPanel title="运行统计" defaultExpanded={false}>
+        <DataPanel title="运行统计" defaultExpanded={Boolean(runtimeSummary)}>
           <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-            <div className="flex justify-between">
-              <span>前向传播时间:</span>
-              <span>12.3ms</span>
-            </div>
-            <div className="flex justify-between">
-              <span>内存使用:</span>
-              <span>2.1GB</span>
-            </div>
-            <div className="flex justify-between">
-              <span>GPU 利用率:</span>
-              <span>78%</span>
-            </div>
-            <div className="flex justify-between">
-              <span>批处理大小:</span>
-              <span>32</span>
-            </div>
-            <div className="flex justify-between">
-              <span>序列长度:</span>
-              <span>512</span>
-            </div>
+            {runtimeMetrics.map((metric) => (
+              <div key={metric.label} className="flex justify-between">
+                <span>{metric.label}:</span>
+                <span>{metric.value}</span>
+              </div>
+            ))}
           </div>
+
+          {tokenSequence.length > 0 && (
+            <div className="mt-3 space-y-2 text-xs text-slate-500 dark:text-slate-400">
+              <div className="font-medium text-slate-600 dark:text-slate-300">输入 Token</div>
+              <div className="flex flex-wrap gap-2">
+                {displayedTokens.map((token, index) => (
+                  <span
+                    key={`${token}-${index}`}
+                    className="rounded-full bg-slate-100 px-2 py-1 text-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                  >
+                    {token}
+                  </span>
+                ))}
+                {tokenSequence.length > displayedTokens.length && (
+                  <span className="text-slate-400 dark:text-slate-500">
+                    +{tokenSequence.length - displayedTokens.length}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!runtimeSummary && tokenSequence.length === 0 && (
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">尚未执行推理。</p>
+          )}
         </DataPanel>
       </div>
     </div>
