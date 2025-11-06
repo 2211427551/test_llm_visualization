@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { interpolatePurples, scaleLinear, select } from 'd3'
+import { downsampleSparseMatrix } from '../../utils/dataTransform'
 import type { SparseAttentionData } from '../../types/visualization'
 
 interface SparseAttentionMatrixProps {
@@ -16,13 +17,32 @@ interface AttentionCell {
 
 const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: SparseAttentionMatrixProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null)
+  const processedMatrix = useMemo(() => downsampleSparseMatrix(data.matrix), [data.matrix])
+  const processedLabels = useMemo(() => {
+    if (processedMatrix.length === 0) {
+      return [] as string[]
+    }
+
+    if (data.headLabels.length === processedMatrix.length) {
+      return data.headLabels
+    }
+
+    const step = Math.max(1, Math.floor(data.headLabels.length / processedMatrix.length))
+    return processedMatrix.map((_, index) => {
+      const labelIndex = Math.min(index * step, data.headLabels.length - 1)
+      return data.headLabels[labelIndex] ?? `位置 ${index + 1}`
+    })
+  }, [data.headLabels, processedMatrix])
 
   useEffect(() => {
-    if (!svgRef.current || data.matrix.length === 0 || data.matrix[0].length === 0) {
+    if (!svgRef.current || processedMatrix.length === 0 || processedMatrix[0].length === 0) {
+      if (svgRef.current) {
+        select(svgRef.current).selectAll('*').remove()
+      }
       return
     }
 
-    const size = data.matrix.length
+    const size = processedMatrix.length
     const cellSize = Math.max(Math.min(28, 220 / size), 14)
     const labelPadding = 36
     const width = size * cellSize + labelPadding + 8
@@ -33,7 +53,7 @@ const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: Sp
 
     const intensityScale = scaleLinear().domain([0, 1]).range([0.15, 0.95])
 
-    const flattened: AttentionCell[] = data.matrix.flatMap((row, rowIndex) =>
+    const flattened: AttentionCell[] = processedMatrix.flatMap((row, rowIndex) =>
       row.map((cell, columnIndex) => ({
         rowIndex,
         columnIndex,
@@ -84,7 +104,7 @@ const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: Sp
     const columnLabels = svg.selectAll<SVGTextElement, string>('text.column-label')
 
     columnLabels
-      .data(data.headLabels)
+      .data(processedLabels)
       .join(
         (enter) =>
           enter
@@ -107,7 +127,7 @@ const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: Sp
     const rowLabels = svg.selectAll<SVGTextElement, string>('text.row-label')
 
     rowLabels
-      .data(data.headLabels)
+      .data(processedLabels)
       .join(
         (enter) =>
           enter
@@ -126,7 +146,7 @@ const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: Sp
       .transition()
       .duration(400)
       .attr('opacity', 1)
-  }, [data])
+  }, [processedLabels, processedMatrix])
 
   return <svg ref={svgRef} role="img" aria-label={ariaLabel} className="h-auto w-full" focusable="false" />
 }

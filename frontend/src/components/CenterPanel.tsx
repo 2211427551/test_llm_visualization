@@ -17,11 +17,17 @@ const CenterPanel = () => {
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const layers = currentStep.layers
+  const hasLayers = layers.length > 0
 
   const chartHeight = useMemo(() => Math.max(layers.length * 110, 360), [layers.length])
 
   useEffect(() => {
     if (!svgRef.current) {
+      return
+    }
+
+    if (!hasLayers) {
+      select(svgRef.current).selectAll('*').remove()
       return
     }
 
@@ -157,7 +163,7 @@ const CenterPanel = () => {
         selectLayer(datum.id)
       }
     })
-  }, [chartHeight, isLayerSelected, layers, selectLayer])
+  }, [chartHeight, hasLayers, isLayerSelected, layers, selectLayer])
 
   const selectedLayer = useMemo(() => layers.find((layer) => layer.id === selectedLayerId) ?? layers[0], [
     layers,
@@ -186,6 +192,11 @@ const CenterPanel = () => {
               展示当前步骤内各层的顺序与连接，可通过键盘空格与回车选择。
             </desc>
           </svg>
+          {!hasLayers && (
+            <div className="absolute inset-0 flex items-center justify-center text-sm text-slate-400 dark:text-slate-500">
+              暂无可视化数据，请先执行推理。
+            </div>
+          )}
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="可选层列表">
