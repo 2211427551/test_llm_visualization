@@ -7,7 +7,12 @@ interface DataPanelProps {
   scrollable?: boolean
 }
 
-const DataPanel = ({ title, children, defaultExpanded = true, scrollable = false }: DataPanelProps) => {
+const DataPanel = ({
+  title,
+  children,
+  defaultExpanded = true,
+  scrollable = false,
+}: DataPanelProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
   const panelId = useId()
   const contentId = `${panelId}-content`

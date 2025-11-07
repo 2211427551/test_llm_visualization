@@ -44,27 +44,26 @@ const TensorHeatmap = ({ data, ariaLabel = '张量热力图' }: TensorHeatmapPro
       .selectAll<SVGRectElement, HeatmapCell>('rect.heatmap-cell')
       .data(flattened, (d) => `${d.rowIndex}-${d.columnIndex}`)
 
-    const joined = cells
-      .join(
-        (enter) =>
-          enter
-            .append('rect')
-            .attr('class', 'heatmap-cell')
-            .attr('x', (d) => d.columnIndex * cellSize)
-            .attr('y', (d) => d.rowIndex * cellSize)
-            .attr('width', cellSize - 1)
-            .attr('height', cellSize - 1)
-            .attr('rx', 3)
-            .attr('ry', 3)
-            .attr('stroke', '#e2e8f0')
-            .attr('stroke-width', 0.5)
-            .attr('opacity', 0)
-            .call((selection) => {
-              selection.append('title')
-            }),
-        (update) => update,
-        (exit) => exit.transition().duration(200).attr('opacity', 0).remove(),
-      )
+    const joined = cells.join(
+      (enter) =>
+        enter
+          .append('rect')
+          .attr('class', 'heatmap-cell')
+          .attr('x', (d) => d.columnIndex * cellSize)
+          .attr('y', (d) => d.rowIndex * cellSize)
+          .attr('width', cellSize - 1)
+          .attr('height', cellSize - 1)
+          .attr('rx', 3)
+          .attr('ry', 3)
+          .attr('stroke', '#e2e8f0')
+          .attr('stroke-width', 0.5)
+          .attr('opacity', 0)
+          .call((selection) => {
+            selection.append('title')
+          }),
+      (update) => update,
+      (exit) => exit.transition().duration(200).attr('opacity', 0).remove(),
+    )
 
     joined
       .transition()
@@ -72,11 +71,19 @@ const TensorHeatmap = ({ data, ariaLabel = '张量热力图' }: TensorHeatmapPro
       .attr('opacity', 1)
       .attr('fill', (d) => interpolateBlues(intensityScale(d.value)))
 
-    joined.select('title').text((d) => `位置 [${d.rowIndex + 1}, ${d.columnIndex + 1}] · 值 ${d.value.toFixed(3)}`)
+    joined
+      .select('title')
+      .text((d) => `位置 [${d.rowIndex + 1}, ${d.columnIndex + 1}] · 值 ${d.value.toFixed(3)}`)
   }, [processedData])
 
   return (
-    <svg ref={svgRef} role="img" aria-label={ariaLabel} className="h-auto w-full" focusable="false" />
+    <svg
+      ref={svgRef}
+      role="img"
+      aria-label={ariaLabel}
+      className="h-auto w-full"
+      focusable="false"
+    />
   )
 }
 

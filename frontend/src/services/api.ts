@@ -1,6 +1,6 @@
 /**
  * API 服务模块
- * 
+ *
  * 功能：
  * - 封装所有后端 API 调用
  * - 统一错误处理
@@ -8,7 +8,12 @@
  * - 超时和重试机制
  */
 
-import type { CapturedVisualizationData, ForwardResult, InitializeResult, ModelConfig } from '../types/api'
+import type {
+  CapturedVisualizationData,
+  ForwardResult,
+  InitializeResult,
+  ModelConfig,
+} from '../types/api'
 import type { StepVisualizationData } from '../types/visualization'
 
 // API 响应接口定义
@@ -130,7 +135,10 @@ export const initializeModel = async (): Promise<InitializeResult> => {
   return mapInitialize(response)
 }
 
-export const forwardInference = async (payload: { text: string; captureData?: boolean }): Promise<ForwardResult> => {
+export const forwardInference = async (payload: {
+  text: string
+  captureData?: boolean
+}): Promise<ForwardResult> => {
   const response = await request<ForwardApiResponse>('/forward', {
     method: 'POST',
     body: JSON.stringify({

@@ -28,11 +28,12 @@ describe('App', () => {
   it('renders localized content and chart title', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () =>
-        new Response(JSON.stringify(mockInitializeResponse), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }),
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify(mockInitializeResponse), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }),
       ),
     )
 

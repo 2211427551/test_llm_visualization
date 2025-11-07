@@ -1,6 +1,6 @@
 /**
  * 右侧面板组件
- * 
+ *
  * 功能：
  * - 显示选中层的详细数据
  * - 渲染各种可视化图表
@@ -92,25 +92,34 @@ const RightPanel = () => {
             <p className="text-xs text-slate-500 dark:text-slate-400">
               步骤 {currentStepIndex + 1}/{stepCount} · {currentStep.name}
             </p>
-            <p className="text-base font-semibold text-slate-900 dark:text-slate-50">当前层：{selectedLayer.name}</p>
+            <p className="text-base font-semibold text-slate-900 dark:text-slate-50">
+              当前层：{selectedLayer.name}
+            </p>
           </div>
           <span className="text-xs text-slate-500 dark:text-slate-400">{layerTypeLabel}</span>
         </div>
-        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{selectedLayer.summary}</p>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+          {selectedLayer.summary}
+        </p>
         {selectedLayer.sparseAttention?.note && (
           <p className="mt-2 rounded-md bg-slate-100 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
             {selectedLayer.sparseAttention.note}
           </p>
         )}
         {selectedLayer.moeRouting?.description && (
-          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{selectedLayer.moeRouting.description}</p>
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+            {selectedLayer.moeRouting.description}
+          </p>
         )}
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto" role="region" aria-label="层级数据详情">
         <DataPanel title="张量热力图" scrollable={false}>
           <div className="space-y-2">
-            <TensorHeatmap data={selectedLayer.tensorHeatmap} ariaLabel={`张量热力图 · ${selectedLayer.name}`} />
+            <TensorHeatmap
+              data={selectedLayer.tensorHeatmap}
+              ariaLabel={`张量热力图 · ${selectedLayer.name}`}
+            />
             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>0.0</span>
               <span>权重热度</span>

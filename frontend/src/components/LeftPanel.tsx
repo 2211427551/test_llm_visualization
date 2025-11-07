@@ -1,6 +1,6 @@
 /**
  * 左侧面板组件
- * 
+ *
  * 功能：
  * - 模型配置和初始化
  * - 文本输入和推理控制
@@ -26,11 +26,11 @@ const formatTimestamp = (value: string | undefined) => {
 
 const LeftPanel = () => {
   // 状态管理
-  const [inputText, setInputText] = useState('')                    // 输入文本
-  const [modelConfig, setModelConfig] = useState<ModelConfig | null>(null)  // 模型配置
-  const [initLoading, setInitLoading] = useState(false)              // 初始化加载状态
-  const [forwardLoading, setForwardLoading] = useState(false)         // 推理加载状态
-  const [initError, setInitError] = useState<string | null>(null)    // 初始化错误信息
+  const [inputText, setInputText] = useState('') // 输入文本
+  const [modelConfig, setModelConfig] = useState<ModelConfig | null>(null) // 模型配置
+  const [initLoading, setInitLoading] = useState(false) // 初始化加载状态
+  const [forwardLoading, setForwardLoading] = useState(false) // 推理加载状态
+  const [initError, setInitError] = useState<string | null>(null) // 初始化错误信息
   const [forwardError, setForwardError] = useState<string | null>(null) // 推理错误信息
   const [statusMessage, setStatusMessage] = useState<string | null>(null) // 状态消息
 
@@ -137,7 +137,9 @@ const LeftPanel = () => {
     <div className="flex h-full flex-col gap-4" aria-label="左侧控制面板">
       <div>
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">输入与控制</h2>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">配置推理参数并逐步查看模型层级。</p>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+          配置推理参数并逐步查看模型层级。
+        </p>
       </div>
 
       <div className="space-y-3" aria-label="模型状态">
@@ -183,7 +185,10 @@ const LeftPanel = () => {
       </div>
 
       <div className="space-y-2" aria-label="文本输入">
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="model-input">
+        <label
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+          htmlFor="model-input"
+        >
           文本输入
         </label>
         <textarea
@@ -212,13 +217,23 @@ const LeftPanel = () => {
         </button>
       </div>
 
-      <div className="rounded-lg border border-slate-200 p-3 dark:border-slate-700" aria-labelledby="step-status-heading">
+      <div
+        className="rounded-lg border border-slate-200 p-3 dark:border-slate-700"
+        aria-labelledby="step-status-heading"
+      >
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p id="step-status-heading" className="text-xs font-medium text-slate-600 dark:text-slate-400">
+            <p
+              id="step-status-heading"
+              className="text-xs font-medium text-slate-600 dark:text-slate-400"
+            >
               当前步骤
             </p>
-            <p role="status" aria-live="polite" className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-50">
+            <p
+              role="status"
+              aria-live="polite"
+              className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-50"
+            >
               第 {currentStepIndex + 1} 步 · {currentStep.name}
             </p>
           </div>
@@ -232,9 +247,14 @@ const LeftPanel = () => {
           </div>
         </div>
 
-        <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{currentStep.description}</p>
+        <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+          {currentStep.description}
+        </p>
 
-        <div className="mt-2 h-2 w-full rounded-full bg-slate-200 dark:bg-slate-700" aria-hidden="true">
+        <div
+          className="mt-2 h-2 w-full rounded-full bg-slate-200 dark:bg-slate-700"
+          aria-hidden="true"
+        >
           <div
             className="h-2 rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
             style={{ width: `${progressPercentage}%` }}

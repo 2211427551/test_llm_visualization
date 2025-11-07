@@ -15,7 +15,10 @@ interface AttentionCell {
   isSparse: boolean
 }
 
-const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: SparseAttentionMatrixProps) => {
+const SparseAttentionMatrix = ({
+  data,
+  ariaLabel = '稀疏注意力矩阵',
+}: SparseAttentionMatrixProps) => {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const processedMatrix = useMemo(() => downsampleSparseMatrix(data.matrix), [data.matrix])
   const processedLabels = useMemo(() => {
@@ -66,26 +69,25 @@ const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: Sp
       .selectAll<SVGRectElement, AttentionCell>('rect.attention-cell')
       .data(flattened, (d) => `${d.rowIndex}-${d.columnIndex}`)
 
-    const joined = cells
-      .join(
-        (enter) =>
-          enter
-            .append('rect')
-            .attr('class', 'attention-cell')
-            .attr('x', (d) => labelPadding + d.columnIndex * cellSize)
-            .attr('y', (d) => 8 + d.rowIndex * cellSize)
-            .attr('width', cellSize - 1)
-            .attr('height', cellSize - 1)
-            .attr('rx', 2)
-            .attr('ry', 2)
-            .attr('stroke-width', 1)
-            .attr('opacity', 0)
-            .call((selection) => {
-              selection.append('title')
-            }),
-        (update) => update,
-        (exit) => exit.transition().duration(200).attr('opacity', 0).remove(),
-      )
+    const joined = cells.join(
+      (enter) =>
+        enter
+          .append('rect')
+          .attr('class', 'attention-cell')
+          .attr('x', (d) => labelPadding + d.columnIndex * cellSize)
+          .attr('y', (d) => 8 + d.rowIndex * cellSize)
+          .attr('width', cellSize - 1)
+          .attr('height', cellSize - 1)
+          .attr('rx', 2)
+          .attr('ry', 2)
+          .attr('stroke-width', 1)
+          .attr('opacity', 0)
+          .call((selection) => {
+            selection.append('title')
+          }),
+      (update) => update,
+      (exit) => exit.transition().duration(200).attr('opacity', 0).remove(),
+    )
 
     joined
       .transition()
@@ -97,8 +99,9 @@ const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: Sp
 
     joined
       .select('title')
-      .text((d) =>
-        `${d.isSparse ? '稀疏区域' : '活跃连接'} · 位置 [${d.rowIndex + 1}, ${d.columnIndex + 1}] · 权重 ${d.value.toFixed(3)}`,
+      .text(
+        (d) =>
+          `${d.isSparse ? '稀疏区域' : '活跃连接'} · 位置 [${d.rowIndex + 1}, ${d.columnIndex + 1}] · 权重 ${d.value.toFixed(3)}`,
       )
 
     const columnLabels = svg.selectAll<SVGTextElement, string>('text.column-label')
@@ -148,7 +151,15 @@ const SparseAttentionMatrix = ({ data, ariaLabel = '稀疏注意力矩阵' }: Sp
       .attr('opacity', 1)
   }, [processedLabels, processedMatrix])
 
-  return <svg ref={svgRef} role="img" aria-label={ariaLabel} className="h-auto w-full" focusable="false" />
+  return (
+    <svg
+      ref={svgRef}
+      role="img"
+      aria-label={ariaLabel}
+      className="h-auto w-full"
+      focusable="false"
+    />
+  )
 }
 
 export default SparseAttentionMatrix

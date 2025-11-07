@@ -1,5 +1,5 @@
+// 移除未使用的 LayerVisualizationData 导入，该类型在本文件中并未被引用
 import type {
-  LayerVisualizationData,
   MoERouteDefinition,
   SparseAttentionCell,
   StepVisualizationData,
@@ -37,10 +37,7 @@ const createSparseAttentionMatrix = (
   )
 }
 
-const createMoERoutes = (
-  tokenWeights: number[][],
-  expertIds: string[],
-): MoERouteDefinition[] => {
+const createMoERoutes = (tokenWeights: number[][], expertIds: string[]): MoERouteDefinition[] => {
   return tokenWeights.flatMap((weights, tokenIndex) =>
     weights.map((weight, expertIndex) => ({
       tokenId: `token-${tokenIndex + 1}`,
@@ -61,14 +58,21 @@ const visualizationSteps: StepVisualizationData[] = [
         name: '分词嵌入',
         type: 'input',
         summary: '将汉字序列映射为稠密的向量表示，保留语义距离。',
-        tensorHeatmap: createHeatmapMatrix(8, 8, (i, j) => Math.sin((i + 1) * 0.6) * 0.25 + Math.cos((j + 1) * 0.4) * 0.25 + 0.5),
+        tensorHeatmap: createHeatmapMatrix(
+          8,
+          8,
+          (i, j) => Math.sin((i + 1) * 0.6) * 0.25 + Math.cos((j + 1) * 0.4) * 0.25 + 0.5,
+        ),
         sparseAttention: {
           headLabels: Array.from({ length: 8 }, (_, index) => `位置 ${index + 1}`),
           matrix: createSparseAttentionMatrix(8, [1, 2, 5], 0.1),
           note: '输入阶段的注意力更集中在局部窗口，用于捕捉短程依赖。',
         },
         moeRouting: {
-          tokens: Array.from({ length: 4 }, (_, index) => ({ id: `token-${index + 1}`, label: `令牌 ${index + 1}` })),
+          tokens: Array.from({ length: 4 }, (_, index) => ({
+            id: `token-${index + 1}`,
+            label: `令牌 ${index + 1}`,
+          })),
           experts: [
             { id: 'expert-a', label: '专家 A' },
             { id: 'expert-b', label: '专家 B' },
@@ -98,7 +102,11 @@ const visualizationSteps: StepVisualizationData[] = [
         name: '归一化融合',
         type: 'embedding',
         summary: '通过层归一化稳定分布，避免梯度不稳定。',
-        tensorHeatmap: createHeatmapMatrix(8, 8, (i, j) => 0.48 + Math.sin(i * 0.3) * 0.15 + Math.cos(j * 0.25) * 0.15),
+        tensorHeatmap: createHeatmapMatrix(
+          8,
+          8,
+          (i, j) => 0.48 + Math.sin(i * 0.3) * 0.15 + Math.cos(j * 0.25) * 0.15,
+        ),
       },
     ],
   },
@@ -112,14 +120,21 @@ const visualizationSteps: StepVisualizationData[] = [
         name: '多头注意力',
         type: 'attention',
         summary: '聚合上下文信息，重点关注动宾结构与关键实体。',
-        tensorHeatmap: createHeatmapMatrix(10, 10, (i, j) => 0.55 + 0.25 * Math.cos((i - j) * 0.45)),
+        tensorHeatmap: createHeatmapMatrix(
+          10,
+          10,
+          (i, j) => 0.55 + 0.25 * Math.cos((i - j) * 0.45),
+        ),
         sparseAttention: {
           headLabels: Array.from({ length: 10 }, (_, index) => `位置 ${index + 1}`),
           matrix: createSparseAttentionMatrix(10, [0, 4, 8], 0.08),
           note: '稀疏头聚焦到关键主谓语，非稀疏区域色彩更深。',
         },
         moeRouting: {
-          tokens: Array.from({ length: 5 }, (_, index) => ({ id: `token-${index + 1}`, label: `令牌 ${index + 1}` })),
+          tokens: Array.from({ length: 5 }, (_, index) => ({
+            id: `token-${index + 1}`,
+            label: `令牌 ${index + 1}`,
+          })),
           experts: [
             { id: 'expert-a', label: '专家 A' },
             { id: 'expert-b', label: '专家 B' },
@@ -143,7 +158,11 @@ const visualizationSteps: StepVisualizationData[] = [
         name: '稀疏注意力头',
         type: 'attention',
         summary: '稀疏模式仅保留高贡献连接，大幅降低复杂度。',
-        tensorHeatmap: createHeatmapMatrix(10, 10, (i, j) => 0.35 + 0.45 * Math.exp(-Math.abs(i - j) * 0.35)),
+        tensorHeatmap: createHeatmapMatrix(
+          10,
+          10,
+          (i, j) => 0.35 + 0.45 * Math.exp(-Math.abs(i - j) * 0.35),
+        ),
         sparseAttention: {
           headLabels: Array.from({ length: 10 }, (_, index) => `位置 ${index + 1}`),
           matrix: createSparseAttentionMatrix(10, [1, 3, 7], 0.05),
@@ -155,7 +174,11 @@ const visualizationSteps: StepVisualizationData[] = [
         name: '前馈网络',
         type: 'feedforward',
         summary: '逐位置非线性变换，放大关键信号。',
-        tensorHeatmap: createHeatmapMatrix(10, 10, (i, j) => 0.42 + Math.sin(i * 0.5) * 0.28 + Math.cos(j * 0.32) * 0.18),
+        tensorHeatmap: createHeatmapMatrix(
+          10,
+          10,
+          (i, j) => 0.42 + Math.sin(i * 0.5) * 0.28 + Math.cos(j * 0.32) * 0.18,
+        ),
       },
     ],
   },
@@ -169,9 +192,16 @@ const visualizationSteps: StepVisualizationData[] = [
         name: '门控决策',
         type: 'feedforward',
         summary: '结合注意力上下文与状态，动态选择需要激活的专家。',
-        tensorHeatmap: createHeatmapMatrix(8, 8, (i, j) => 0.48 + 0.35 * Math.exp(-Math.abs(i - j) * 0.4)),
+        tensorHeatmap: createHeatmapMatrix(
+          8,
+          8,
+          (i, j) => 0.48 + 0.35 * Math.exp(-Math.abs(i - j) * 0.4),
+        ),
         moeRouting: {
-          tokens: Array.from({ length: 6 }, (_, index) => ({ id: `token-${index + 1}`, label: `令牌 ${index + 1}` })),
+          tokens: Array.from({ length: 6 }, (_, index) => ({
+            id: `token-${index + 1}`,
+            label: `令牌 ${index + 1}`,
+          })),
           experts: [
             { id: 'expert-b', label: '专家 B' },
             { id: 'expert-c', label: '专家 C' },
@@ -204,7 +234,11 @@ const visualizationSteps: StepVisualizationData[] = [
         name: '输出投影',
         type: 'output',
         summary: '映射至词表空间，用于生成最终预测结果。',
-        tensorHeatmap: createHeatmapMatrix(8, 8, (i, j) => 0.56 + 0.25 * Math.cos(i * 0.4) * Math.sin(j * 0.45)),
+        tensorHeatmap: createHeatmapMatrix(
+          8,
+          8,
+          (i, j) => 0.56 + 0.25 * Math.cos(i * 0.4) * Math.sin(j * 0.45),
+        ),
       },
     ],
   },
