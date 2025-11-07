@@ -1,6 +1,6 @@
 /**
  * 中央面板组件
- * 
+ *
  * 功能：
  * - 显示模型架构的可视化
  * - 展示各层的处理流程
@@ -15,11 +15,11 @@ import type { LayerType } from '../types/visualization'
 
 // 各层类型的颜色配置
 const layerColors: Record<LayerType, { fill: string; stroke: string }> = {
-  input: { fill: '#bfdbfe', stroke: '#2563eb' },      // 输入层：蓝色
-  embedding: { fill: '#bbf7d0', stroke: '#16a34a' },   // 嵌入层：绿色
-  attention: { fill: '#e9d5ff', stroke: '#7c3aed' },   // 注意力层：紫色
+  input: { fill: '#bfdbfe', stroke: '#2563eb' }, // 输入层：蓝色
+  embedding: { fill: '#bbf7d0', stroke: '#16a34a' }, // 嵌入层：绿色
+  attention: { fill: '#e9d5ff', stroke: '#7c3aed' }, // 注意力层：紫色
   feedforward: { fill: '#fed7aa', stroke: '#f97316' }, // 前馈层：橙色
-  output: { fill: '#fecaca', stroke: '#ef4444' },      // 输出层：红色
+  output: { fill: '#fecaca', stroke: '#ef4444' }, // 输出层：红色
 }
 
 const CenterPanel = () => {
@@ -68,7 +68,7 @@ const CenterPanel = () => {
       return `M ${xCenter - xOffset} ${sourceY} C ${xCenter - xOffset / 2} ${sourceY}, ${xCenter + xOffset / 2} ${targetY}, ${xCenter + xOffset} ${targetY}`
     }
 
-    const links = svg.selectAll<SVGPathElement, typeof linkData[number]>('path.layer-link')
+    const links = svg.selectAll<SVGPathElement, (typeof linkData)[number]>('path.layer-link')
 
     links
       .data(linkData, (d) => d.id)
@@ -132,11 +132,7 @@ const CenterPanel = () => {
         return group
       })
 
-    nodeEnter
-      .transition()
-      .duration(600)
-      .ease(easeCubicInOut)
-      .attr('opacity', 1)
+    nodeEnter.transition().duration(600).ease(easeCubicInOut).attr('opacity', 1)
 
     const mergedNodes = svg.selectAll<SVGGElement, (typeof layers)[number]>('g.layer-node')
 
@@ -176,10 +172,10 @@ const CenterPanel = () => {
     })
   }, [chartHeight, hasLayers, isLayerSelected, layers, selectLayer])
 
-  const selectedLayer = useMemo(() => layers.find((layer) => layer.id === selectedLayerId) ?? layers[0], [
-    layers,
-    selectedLayerId,
-  ])
+  const selectedLayer = useMemo(
+    () => layers.find((layer) => layer.id === selectedLayerId) ?? layers[0],
+    [layers, selectedLayerId],
+  )
 
   return (
     <div className="flex h-full flex-col">

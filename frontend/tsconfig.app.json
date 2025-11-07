@@ -5,7 +5,8 @@
     "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client"],
+    // 添加 "node" 类型支持，以便在代码中使用 process.env 等 Node.js 全局变量
+    "types": ["vite/client", "node"],
     "skipLibCheck": true,
 
     /* Bundler mode */

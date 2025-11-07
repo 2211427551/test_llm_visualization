@@ -133,21 +133,24 @@ export const VisualizationProvider = ({ children }: PropsWithChildren) => {
     return currentStep.layers[0] ?? null
   }, [currentStep, selectedLayerId])
 
-  const updateVisualization = useCallback((payload: VisualizationPayload) => {
-    setSteps((prev) => {
-      const nextSteps = payload.steps.length > 0 ? payload.steps : defaultSteps
-      const fallbackLayerId = nextSteps[0]?.layers[0]?.id ?? null
-      if (fallbackLayerId !== selectedLayerId) {
-        setSelectedLayerId(fallbackLayerId)
-      }
-      if (prev !== nextSteps) {
-        setCurrentStepIndex(0)
-      }
-      setRuntimeSummary(payload.runtime ?? null)
-      setTokenSequence(payload.tokenSequence ?? [])
-      return nextSteps
-    })
-  }, [selectedLayerId])
+  const updateVisualization = useCallback(
+    (payload: VisualizationPayload) => {
+      setSteps((prev) => {
+        const nextSteps = payload.steps.length > 0 ? payload.steps : defaultSteps
+        const fallbackLayerId = nextSteps[0]?.layers[0]?.id ?? null
+        if (fallbackLayerId !== selectedLayerId) {
+          setSelectedLayerId(fallbackLayerId)
+        }
+        if (prev !== nextSteps) {
+          setCurrentStepIndex(0)
+        }
+        setRuntimeSummary(payload.runtime ?? null)
+        setTokenSequence(payload.tokenSequence ?? [])
+        return nextSteps
+      })
+    },
+    [selectedLayerId],
+  )
 
   const resetVisualization = useCallback(() => {
     setSteps(defaultSteps)
@@ -158,6 +161,8 @@ export const VisualizationProvider = ({ children }: PropsWithChildren) => {
   }, [])
 
   const value = useMemo<VisualizationContextValue>(() => {
+    // 在 useMemo 内部计算 canGoToPrevious 和 canGoToNext
+    // 这两个值依赖于 currentStepIndex 和 upperBound，不需要放在依赖数组中
     const canGoToPrevious = currentStepIndex > 0
     const canGoToNext = currentStepIndex < upperBound
 
@@ -183,7 +188,8 @@ export const VisualizationProvider = ({ children }: PropsWithChildren) => {
       tokenSequence,
     }
   }, [
-    canGoToNext,
+    // 修复错误：移除 canGoToNext，它是在 useMemo 内部计算的派生值
+    // 只保留它依赖的基础值：currentStepIndex 和 upperBound
     currentStep,
     currentStepId,
     currentStepIndex,
@@ -192,6 +198,7 @@ export const VisualizationProvider = ({ children }: PropsWithChildren) => {
     isLayerSelected,
     resetVisualization,
     runtimeSummary,
+    selectLayer,
     selectedLayer,
     selectedLayerId,
     setStepById,
@@ -206,6 +213,8 @@ export const VisualizationProvider = ({ children }: PropsWithChildren) => {
   return <VisualizationContext.Provider value={value}>{children}</VisualizationContext.Provider>
 }
 
+// 允许同时导出 Provider 组件和 hook，这是 Context API 的标准模式
+// eslint-disable-next-line react-refresh/only-export-components
 export const useVisualizationState = () => {
   const context = useContext(VisualizationContext)
   if (!context) {

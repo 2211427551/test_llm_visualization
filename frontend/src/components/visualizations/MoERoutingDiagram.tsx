@@ -50,7 +50,9 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
       .padding(0.5)
 
     const maxWeight = processedData.routes.reduce((acc, route) => Math.max(acc, route.weight), 0)
-    const weightScale = scaleLinear().domain([0, maxWeight || 1]).range([1, 14])
+    const weightScale = scaleLinear()
+      .domain([0, maxWeight || 1])
+      .range([1, 14])
 
     const createRoutePath = (route: RouteDatum) => {
       const sourceY = tokenScale(route.tokenId) ?? 40
@@ -86,13 +88,11 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
       .attr('stroke-opacity', (route) => 0.25 + (route.weight / (maxWeight || 1)) * 0.65)
       .attr('d', (route) => createRoutePath(route))
 
-    mergedRoutes
-      .select('title')
-      .text((route) => {
-        const tokenLabel = helpers.tokenMap.get(route.tokenId) ?? route.tokenId
-        const expertLabel = helpers.expertMap.get(route.expertId) ?? route.expertId
-        return `${tokenLabel} → ${expertLabel} · 权重 ${(route.weight * 100).toFixed(1)}%`
-      })
+    mergedRoutes.select('title').text((route) => {
+      const tokenLabel = helpers.tokenMap.get(route.tokenId) ?? route.tokenId
+      const expertLabel = helpers.expertMap.get(route.expertId) ?? route.expertId
+      return `${tokenLabel} → ${expertLabel} · 权重 ${(route.weight * 100).toFixed(1)}%`
+    })
 
     const renderNodes = <T extends TokenDatum | ExpertDatum>(
       selector: string,
@@ -101,7 +101,7 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
       yScale: (value: string) => number | undefined,
       fillColor: string,
     ) => {
-      const className = selector.includes('.') ? selector.split('.').pop() ?? '' : selector
+      const className = selector.includes('.') ? (selector.split('.').pop() ?? '') : selector
       const groups = svg.selectAll<SVGGElement, T>(selector)
 
       const mergedGroups = groups
@@ -128,15 +128,17 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
             .attr('stroke', '#0ea5e9')
             .attr('stroke-width', 1)
 
+          // 修复类型错误：直接使用 item.label，因为泛型类型 T 保证了 label 属性存在
+          // 之前使用三元运算符 'label' in item 会导致 TypeScript 类型收窄为 never
           group
             .append('text')
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'middle')
             .attr('font-size', 11)
             .attr('fill', '#0f172a')
-            .text((item) => ('label' in item ? item.label : item.id))
+            .text((item) => item.label)
 
-          group.append('title').text((item) => ('label' in item ? item.label : item.id))
+          group.append('title').text((item) => item.label)
 
           return group
         })
@@ -151,14 +153,23 @@ const MoERoutingDiagram = ({ data, ariaLabel = 'MoE 路由流向图' }: MoERouti
           return `translate(${xPosition}, ${y})`
         })
 
-      mergedGroups.select('title').text((item) => ('label' in item ? item.label : item.id))
+      // 修复类型错误：直接使用 item.label
+      mergedGroups.select('title').text((item) => item.label)
     }
 
     renderNodes<TokenDatum>('g.token-node', processedData.tokens, leftX, tokenScale, '#bae6fd')
     renderNodes<ExpertDatum>('g.expert-node', processedData.experts, rightX, expertScale, '#c4b5fd')
   }, [helpers, processedData])
 
-  return <svg ref={svgRef} role="img" aria-label={ariaLabel} className="h-auto w-full" focusable="false" />
+  return (
+    <svg
+      ref={svgRef}
+      role="img"
+      aria-label={ariaLabel}
+      className="h-auto w-full"
+      focusable="false"
+    />
+  )
 }
 
 export default MoERoutingDiagram
