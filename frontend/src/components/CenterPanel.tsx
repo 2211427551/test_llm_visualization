@@ -1,14 +1,25 @@
+/**
+ * 中央面板组件
+ * 
+ * 功能：
+ * - 显示模型架构的可视化
+ * - 展示各层的处理流程
+ * - 支持层的选择和交互
+ * - 使用 D3.js 进行图形渲染
+ */
+
 import { useEffect, useMemo, useRef } from 'react'
 import { easeCubicInOut, scalePoint, select } from 'd3'
 import { useVisualizationState } from '../hooks/useVisualizationState'
 import type { LayerType } from '../types/visualization'
 
+// 各层类型的颜色配置
 const layerColors: Record<LayerType, { fill: string; stroke: string }> = {
-  input: { fill: '#bfdbfe', stroke: '#2563eb' },
-  embedding: { fill: '#bbf7d0', stroke: '#16a34a' },
-  attention: { fill: '#e9d5ff', stroke: '#7c3aed' },
-  feedforward: { fill: '#fed7aa', stroke: '#f97316' },
-  output: { fill: '#fecaca', stroke: '#ef4444' },
+  input: { fill: '#bfdbfe', stroke: '#2563eb' },      // 输入层：蓝色
+  embedding: { fill: '#bbf7d0', stroke: '#16a34a' },   // 嵌入层：绿色
+  attention: { fill: '#e9d5ff', stroke: '#7c3aed' },   // 注意力层：紫色
+  feedforward: { fill: '#fed7aa', stroke: '#f97316' }, // 前馈层：橙色
+  output: { fill: '#fecaca', stroke: '#ef4444' },      // 输出层：红色
 }
 
 const CenterPanel = () => {

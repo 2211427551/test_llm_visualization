@@ -1,6 +1,17 @@
+/**
+ * API 服务模块
+ * 
+ * 功能：
+ * - 封装所有后端 API 调用
+ * - 统一错误处理
+ * - 类型安全的请求/响应
+ * - 超时和重试机制
+ */
+
 import type { CapturedVisualizationData, ForwardResult, InitializeResult, ModelConfig } from '../types/api'
 import type { StepVisualizationData } from '../types/visualization'
 
+// API 响应接口定义
 interface InitializeApiResponse {
   success: boolean
   message: string
@@ -20,6 +31,7 @@ interface ForwardApiResponse {
   } | null
 }
 
+// 常量配置
 const DEFAULT_ERROR_MESSAGE = '网络请求失败，请检查后端服务状态。'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1'
 const REQUEST_TIMEOUT = 15000

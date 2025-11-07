@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Quick start script for Docker deployment
-# This script provides easy commands to start the application
+# Docker 部署快速启动脚本
+# 此脚本提供启动应用程序的便捷命令
 
 set -e
 
-# Colors for output
+# 输出颜色配置
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m' # 无颜色
 
 print_header() {
     echo -e "${BLUE}=====================================${NC}"
-    echo -e "${BLUE}  Docker Deployment Quick Start     ${NC}"
+    echo -e "${BLUE}     Docker 部署快速启动             ${NC}"
     echo -e "${BLUE}=====================================${NC}"
     echo ""
 }
@@ -28,41 +28,41 @@ print_info() {
 
 print_header
 
-echo "Available commands:"
+echo "可用命令："
 echo ""
 
-print_command "./test-deployment.sh" "Build and test the complete deployment"
-print_command "docker compose up --build -d" "Start services in background"
-print_command "docker compose up --build" "Start services with logs"
-print_command "docker compose down" "Stop and remove services"
-print_command "docker compose logs -f" "Follow logs"
-print_command "docker compose ps" "Show service status"
+print_command "./test-deployment.sh" "构建并测试完整部署"
+print_command "docker compose up --build -d" "后台启动服务"
+print_command "docker compose up --build" "启动服务并显示日志"
+print_command "docker compose down" "停止并移除服务"
+print_command "docker compose logs -f" "跟踪日志"
+print_command "docker compose ps" "显示服务状态"
 echo ""
 
-print_info "Environment Setup:"
-echo "1. Copy .env.example to .env and configure as needed"
-echo "2. Run './test-deployment.sh' to verify everything works"
+print_info "环境设置："
+echo "1. 复制 .env.example 到 .env 并根据需要配置"
+echo "2. 运行 './test-deployment.sh' 验证一切正常"
 echo ""
 
-print_info "Service URLs:"
-echo "- Frontend: http://localhost:3000"
-echo "- Backend: http://localhost:8000"
-echo "- API Docs: http://localhost:8000/docs"
+print_info "服务地址："
+echo "- 前端: http://localhost:3000"
+echo "- 后端: http://localhost:8000"
+echo "- API 文档: http://localhost:8000/docs"
 echo ""
 
-print_info "For production deployment:"
+print_info "生产环境部署："
 echo "docker compose --profile production up --build -d"
 echo ""
 
-print_info "For WSL2 users:"
-echo "Make sure to configure port forwarding if accessing from Windows"
+print_info "WSL2 用户注意："
+echo "如果从 Windows 访问，请确保配置端口转发"
 echo ""
 
-# Check if .env exists
+# 检查 .env 文件是否存在
 if [ ! -f .env ]; then
-    print_info "⚠️  .env file not found. Creating from template..."
+    print_info "⚠️  未找到 .env 文件。正在从模板创建..."
     cp .env.example .env
-    print_info "✅ .env file created. Please review and modify as needed."
+    print_info "✅ .env 文件已创建。请检查并根据需要修改。"
 fi
 
-echo "Ready to deploy! 🚀"
+echo "准备部署！🚀"

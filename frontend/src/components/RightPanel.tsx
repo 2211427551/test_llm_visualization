@@ -1,3 +1,13 @@
+/**
+ * 右侧面板组件
+ * 
+ * 功能：
+ * - 显示选中层的详细数据
+ * - 渲染各种可视化图表
+ * - 展示运行时性能指标
+ * - 提供数据导出功能
+ */
+
 import { useMemo } from 'react'
 import DataPanel from './DataPanel'
 import TensorHeatmap from './visualizations/TensorHeatmap'

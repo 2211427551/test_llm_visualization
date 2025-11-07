@@ -1,3 +1,13 @@
+/**
+ * 左侧面板组件
+ * 
+ * 功能：
+ * - 模型配置和初始化
+ * - 文本输入和推理控制
+ * - 状态管理和错误处理
+ * - 与可视化状态的集成
+ */
+
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { forwardInference, initializeModel } from '../services/api'
 import type { ModelConfig } from '../types/api'
@@ -15,13 +25,14 @@ const formatTimestamp = (value: string | undefined) => {
 }
 
 const LeftPanel = () => {
-  const [inputText, setInputText] = useState('')
-  const [modelConfig, setModelConfig] = useState<ModelConfig | null>(null)
-  const [initLoading, setInitLoading] = useState(false)
-  const [forwardLoading, setForwardLoading] = useState(false)
-  const [initError, setInitError] = useState<string | null>(null)
-  const [forwardError, setForwardError] = useState<string | null>(null)
-  const [statusMessage, setStatusMessage] = useState<string | null>(null)
+  // 状态管理
+  const [inputText, setInputText] = useState('')                    // 输入文本
+  const [modelConfig, setModelConfig] = useState<ModelConfig | null>(null)  // 模型配置
+  const [initLoading, setInitLoading] = useState(false)              // 初始化加载状态
+  const [forwardLoading, setForwardLoading] = useState(false)         // 推理加载状态
+  const [initError, setInitError] = useState<string | null>(null)    // 初始化错误信息
+  const [forwardError, setForwardError] = useState<string | null>(null) // 推理错误信息
+  const [statusMessage, setStatusMessage] = useState<string | null>(null) // 状态消息
 
   const {
     steps,
